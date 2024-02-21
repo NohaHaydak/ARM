@@ -13,7 +13,7 @@ void main (void)
 	u16 AHBprescalerValue=2;
 	u8 APBprescalerValue=2;
 	GPIO_pin_t pin;
-	pin.GPIONum=GPIOB;
+	pin.GPIONum=GPIOA;
 	pin.pinMode=PIN_STATUS_GP_OUTPUT_PP_PU;
 	pin.pinNum=GPIO_PIN_NUM7;
 	pin.pinSpeed=PIN_SPEED_MEDIUM_SPEED;
@@ -30,7 +30,7 @@ void main (void)
 
 	while(1)
 	{
-		GPIO_setPinValue(GPIOB, GPIO_PIN_NUM7,VALUE_SET_HIGH );
+		GPIO_setPinValue(GPIOA, GPIO_PIN_NUM7,VALUE_SET_HIGH );
 
 	}
 }

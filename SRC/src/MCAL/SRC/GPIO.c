@@ -5,9 +5,9 @@
  *      Author: Noha
  */
 #include "../INCLUDES/GPIO.h"
-#define WRITE_MODE_MASK_MODER    0b00011
-#define OD_PP_WRITE_MASK_OTYPER  0b00100
-#define PD_PU_WRITE_MASK_OSPEEDR 0b11000
+#define WRITE_MODE_MASK_MODER    0b00000011
+#define OD_PP_WRITE_MASK_OTYPER  0b00000100
+#define PD_PU_WRITE_MASK_OSPEEDR 0b00011000
 #define OD_PP_BIT_NUM            2
 #define PU_PD_BIT_NUM            3
 
@@ -41,7 +41,7 @@ u8 GPIO_initPin(GPIO_pin_t copy_GPIO_pin)
 	else
 	{
 		/*extract mode from the user input value as bit 0 and 1 should be assigned in MODER*/
-		LOC_mode=copy_GPIO_pin.pinMode& WRITE_MODE_MASK_MODER;
+		LOC_mode=(copy_GPIO_pin.pinMode)& WRITE_MODE_MASK_MODER;
 		/*clear bit before assignation*/
 		((volatile GPIO_t* const)copy_GPIO_pin.GPIONum)->GPIOx_MODER&= ~(1<<LOC_pin);
 		((volatile GPIO_t* const)copy_GPIO_pin.GPIONum)->GPIOx_MODER&= ~(1<<(LOC_pin +1));
