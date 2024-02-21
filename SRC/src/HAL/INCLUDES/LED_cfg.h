@@ -16,7 +16,7 @@ typedef enum
 	led_2,
 	led_3,
 	led_4,
-	_tenth_led
+	_led_10
 }LEDS_t;
 
 

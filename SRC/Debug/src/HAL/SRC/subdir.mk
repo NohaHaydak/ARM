@@ -5,15 +5,21 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../src/HAL/SRC/LED.c \
-../src/HAL/SRC/LED_cfg.c 
+../src/HAL/SRC/LED_cfg.c \
+../src/HAL/SRC/SWITCH.c \
+../src/HAL/SRC/SWITCH_cfg.c 
 
 OBJS += \
 ./src/HAL/SRC/LED.o \
-./src/HAL/SRC/LED_cfg.o 
+./src/HAL/SRC/LED_cfg.o \
+./src/HAL/SRC/SWITCH.o \
+./src/HAL/SRC/SWITCH_cfg.o 
 
 C_DEPS += \
 ./src/HAL/SRC/LED.d \
-./src/HAL/SRC/LED_cfg.d 
+./src/HAL/SRC/LED_cfg.d \
+./src/HAL/SRC/SWITCH.d \
+./src/HAL/SRC/SWITCH_cfg.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
