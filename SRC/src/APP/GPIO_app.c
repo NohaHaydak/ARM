@@ -5,8 +5,11 @@
  *      Author: Noha
  */
 
-#include "../MCAL/INCLUDES/GPIO.h"
+
 #include "../MCAL/INCLUDES/RCC.h"
+#include "../HAL/INCLUDES/LED.h"
+#include "../HAL/INCLUDES/SWITCH.h"
+void delay(unsigned int milliseconds);
 
 void main (void)
 {
@@ -25,13 +28,34 @@ void main (void)
 	RCC_ControlPeripheral(peripheral_GPIOE,peri_status_enabled);
 	RCC_ControlPeripheral(peripheral_GPIOH,peri_status_enabled);
 
-	/*testing gpio*/
-	GPIO_initPin(pin);
-
+	/*testing led*/
+	LED_init();
+	SWITCH_init();
+	u8 status;
 	while(1)
 	{
-		GPIO_setPinValue(GPIOA, GPIO_PIN_NUM7,VALUE_SET_HIGH );
+		SWITCH_getStatus(SWITCH_2,& status);
+		if(status==SWITCH_PRESSED)
+		{SWITCH_getStatus(SWITCH_2,& status);
+			delay(200);
+			if(status==SWITCH_PRESSED)
+					{
+						delay(200);
+						LED_setState(led_2, LED_ON );
+
+					}
+		}
 
 	}
 }
 
+void delay(unsigned int milliseconds) {
+    unsigned int i, j;
+
+    for (i = 0; i < milliseconds; i++) {
+        for (j = 0; j < 6000; j++) {
+            // Adjust the loop count based on your processor speed
+            // This loop count may need to be adjusted for different processors
+        }
+    }
+}

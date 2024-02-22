@@ -25,7 +25,7 @@ u8 LED_init(void)
 u8 LED_setState(u32 Copy_led, u8 Copy_state )
 {
 	u8 errorStatus=0;
-	Copy_state=(leds[Copy_led].state)^(leds[Copy_led].connection);
+	Copy_state^=(leds[Copy_led].connection);
 	GPIO_setPinValue(leds[Copy_led].port,leds[Copy_led].pin,Copy_state);
 	return errorStatus;
 }

@@ -16,6 +16,9 @@
 
 #define CONNECTION_PU 1
 #define CONNECTION_PD 0
+
+#define SWITCH_PRESSED 1
+#define SWITCH_NOT_PRESSED 0
 typedef struct
 {
 	void* port;

@@ -10,9 +10,9 @@
 
 const SWITCH_cfg_t switches[NUM_OF_SWITCHES]=
 {
-	[SWITCH_1]={.port= GPIOA, .pin=GPIO_PIN_NUM0, .connection=PIN_STATUS_INPUT_PU},
-	[SWITCH_2]={.port= GPIOA, .pin=GPIO_PIN_NUM1, .connection=PIN_STATUS_INPUT_PU},
-	[SWITCH_3]={.port= GPIOB, .pin=GPIO_PIN_NUM0, .connection=PIN_STATUS_INPUT_PD}
+	[SWITCH_1]={.port= GPIOB, .pin=GPIO_PIN_NUM0, .connection=CONNECTION_PU},
+	[SWITCH_2]={.port= GPIOB, .pin=GPIO_PIN_NUM1, .connection=CONNECTION_PU},
+	[SWITCH_3]={.port= GPIOC, .pin=GPIO_PIN_NUM0, .connection=CONNECTION_PU}
 };
 
 

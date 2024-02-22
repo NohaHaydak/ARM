@@ -17,6 +17,9 @@
 #define CONNECTION_FORWARD 0
 #define CONNECTION_REVESE  1
 
+#define LED_ON 1
+#define LED_OFF 0
+
 typedef struct
 {
 	void* port;
