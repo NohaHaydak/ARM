@@ -18,6 +18,31 @@
 #define PLLN_IS_OUT_OF_RANGE                                  1
 #define PLLM_IS_OUT_OF_RANGE                                  2
 
+
+#define AHB_PRESCALER_VALUE_1   0x00
+#define AHB_PRESCALER_VALUE_2   0x80
+#define AHB_PRESCALER_VALUE_4   0x90
+#define AHB_PRESCALER_VALUE_8   0xA0
+#define AHB_PRESCALER_VALUE_16  0xB0
+#define AHB_PRESCALER_VALUE_64  0xC0
+#define AHB_PRESCALER_VALUE_128 0xD0
+#define AHB_PRESCALER_VALUE_256 0xE0
+#define AHB_PRESCALER_VALUE_512 0xF0
+
+#define APB_PRESCALER_VALUE_1   0x00
+#define APB_PRESCALER_VALUE_2   0x80
+#define APB_PRESCALER_VALUE_4   0xA0
+#define APB_PRESCALER_VALUE_8   0xC0
+#define APB_PRESCALER_VALUE_16  0xE0
+
+
+#define     PLLP_FACTOR2 0b00
+#define		PLLP_FACTOR4 0b01
+#define		PLLP_FACTOR6 0b10
+#define		PLLP_FACTOR8 0b11
+
+#define clk_Source_HSE 0x00400000
+#define clk_Source_HSI 0x00000000
 typedef enum
 {
 	clk_HSE,
@@ -32,11 +57,6 @@ typedef enum
 	clk_Status_OFF
 }RCC_clk_Status_t;
 
-typedef enum
-{
-	clk_Source_HSE,
-	clk_Source_HSI
-}RCC_PLL_ClkSource_t;
 
 typedef enum
 {
@@ -95,11 +115,27 @@ typedef enum
 
 u8 RCC_ControlClk(RCC_clk_t MCopy_clk ,RCC_clk_Status_t MCopy_clk_Status);
 u8 RCC_ConfigureSysclk(RCC_clk_t MCopyclk);
-/*PLL*N/(M*P)*/
-u8 RCC_ConfigurePLL(RCC_PLL_ClkSource_t MCopy_clk_Source,u8 MCopy_PLLM_factor,u8 MCopy_PLLP_factor,u16 MCopy_PLLN_factor);
-u8 RCC_ControlPeripheral(RCC_peripheral_t MCopy_peripheral ,RCC_peripheral_status_t MCopy_peri_status);
-u8 RCC_ConfigurePrescaler(RCC_peripheral_t MCopy_peripheral ,u16 MCopy_AHBprescalerValue ,u8 MCopy_APBprescalerValue);
 
+/**
+ *@brief : Function to configure the pll clk .
+ *@param : clk source : clk_Source_HSE or clk_Source_HSI
+ *@param :PLLM is number between 2,63
+ *@param :PLLN is number bet 192, 432
+ *@param PLLP: PLLP_factor2,PLLP_FACTOR4,PLLP_FACTOR6,PLLP_FACTOR8
+ *@return: Error State.
+ */
+/*PLL*N/(M*P)*/
+u8 RCC_ConfigurePLL(u8 MCopy_clk_Source,u8 MCopy_PLLM_factor,u8 MCopy_PLLP_factor,u16 MCopy_PLLN_factor);
+u8 RCC_ControlPeripheral(RCC_peripheral_t MCopy_peripheral ,RCC_peripheral_status_t MCopy_peri_status);
+
+/**
+ *@brief : Function to configure prescaler of AHB and APB .
+ *@param : MCopy_APB1prescalerValue : APB_PRESCALER_VALUE_1 ,2,4,8 to APB_PRESCALER_VALUE_16
+ *@param :MCopy_APB2prescalerValue : APB_PRESCALER_VALUE_1 ,2,4,8 to APB_PRESCALER_VALUE_16
+ *@param :MCopy_APB1prescalerValue : AHB_PRESCALER_VALUE_1 ,2,4,8,16,64,128,256 to AHB_PRESCALER_VALUE_512
+ *@return: Error State.
+ */
+u8 RCC_ConfigurePrescaler(u8 MCopy_APB1prescalerValue ,u8 MCopy_APB2prescalerValue ,u16 MCopy_AHBprescalerValue);
 
 
 #endif /* MCAL_INCLUDES_RCC_H_ */

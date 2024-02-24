@@ -151,17 +151,6 @@
 #define MCO2_WRITE_MASK          0x80000000
 
 
-
-#define PRESCALER_1   1
-#define PRESCALER_2   2
-#define PRESCALER_4   4
-#define PRESCALER_8   8
-#define PRESCALER_16  16
-#define PRESCALER_64  64
-#define PRESCALER_128 128
-#define PRESCALER_256 256
-#define PRESCALER_512 512
-
 /*RCC_PLLCFGR BITS WRITE MASKING INST 1<<BIT_NUM TO USE IN  BIT MATH OPERATIONS*/
 /*Division factor for the main PLL (PLL) and audio PLL (PLLI2S) input clock*/
 #define PLLM0_WRITE_MASK  0x1
@@ -177,15 +166,19 @@
 
 #define PLLN_WRITE_MASK   0xFFFF803F
 /*Main PLL (PLL) division factor for main system clock*/
+#define PLLP_WRITE_MASK   0xFFFCFFFF
 #define PLLP0_WRITE_MASK  0x10000
 #define PLLP1_WRITE_MASK  0x20000
 /*Main PLL(PLL) and audio PLL (PLLI2S) entry clock source*/
-#define PLLSRC_WRITE_MASK 0x400000
+#define PLLSRC_WRITE_MASK 0xFFBFFFFF
 /*Main PLL (PLL) division factor for USB OTG FS, SDIO and random number generator clocks*/
 #define PLLQ0_WRITE_MASK  0x1000000
 #define PLLQ1_WRITE_MASK  0x2000000
 #define PLLQ2_WRITE_MASK  0x4000000
 #define PLLQ3_WRITE_MASK  0x8000000
+
+
+
 typedef struct
 {
 	u32 RCC_CR;
@@ -234,6 +227,7 @@ static volatile RCC_T * const RCC=(volatile RCC_T * const )RCC_BASE_ADDRESS;
 
 u8 RCC_ControlClk(RCC_clk_t MCopy_clk ,RCC_clk_Status_t MCopy_clk_Status)
 {
+	u8 LOC_errorStatus=0;
 	switch(MCopy_clk)
 	{
 		case clk_HSE:
@@ -298,12 +292,13 @@ u8 RCC_ControlClk(RCC_clk_t MCopy_clk ,RCC_clk_Status_t MCopy_clk_Status)
 			break;
 
 	}
+	return LOC_errorStatus;
 }
 
 
 u8 RCC_ConfigureSysclk(RCC_clk_t MCopyclk)
 {
-	u8 LOC_errorStatus;
+	u8 LOC_errorStatus=0;
 	u16 LOC_time_out=1000;
 
 	switch(MCopyclk)
@@ -372,11 +367,12 @@ u8 RCC_ConfigureSysclk(RCC_clk_t MCopyclk)
 	{
 		/*sws not eq sw*/
 	/*}*/
+	return LOC_errorStatus;
 }
 
-u8 RCC_ConfigurePLL(RCC_PLL_ClkSource_t MCopy_clk_Source,u8 MCopy_PLLM_factor,u8 MCopy_PLLP_factor,u16 MCopy_PLLN_factor)
+u8 RCC_ConfigurePLL(u8 MCopy_clk_Source,u8 MCopy_PLLM_factor,u8 MCopy_PLLP_factor,u16 MCopy_PLLN_factor)
 {
-	u8 LOC_errorStatus;
+	u8 LOC_errorStatus=0;
 	u8 Sysclk_reading0;
 	u8 Sysclk_reading1;
 	Sysclk_reading0= (RCC->RCC_CFGR>>RCC_ConfigrationReg_SWS0)&1;
@@ -398,42 +394,15 @@ u8 RCC_ConfigurePLL(RCC_PLL_ClkSource_t MCopy_clk_Source,u8 MCopy_PLLM_factor,u8
 	}
 	else
 	{
-		switch(MCopy_clk_Source)
-		{
-			case clk_Source_HSE:
-				RCC->RCC_PLLCFGR |= PLLSRC_WRITE_MASK;
-				break;
-			case clk_Source_HSI:
-				RCC->RCC_PLLCFGR &= ~(PLLSRC_WRITE_MASK);
-				break;
-			default:
-				break;
-		}
-		switch(MCopy_PLLP_factor)
-		{
-			case 2:
-				/* 00 is selecting 2 as the devision factor for main sysclk*/
-				RCC->RCC_PLLCFGR &= ~(PLLP0_WRITE_MASK);
-				RCC->RCC_PLLCFGR &= ~(PLLP1_WRITE_MASK);
-				break;
-			case 4:
-				/* 00 is selecting 2 as the devision factor for main sysclk*/
-				RCC->RCC_PLLCFGR |= PLLP0_WRITE_MASK;
-				RCC->RCC_PLLCFGR &= ~(PLLP1_WRITE_MASK);
-				break;
-			case 6:
-				/* 00 is selecting 2 as the devision factor for main sysclk*/
-				RCC->RCC_PLLCFGR &= ~(PLLP0_WRITE_MASK);
-				RCC->RCC_PLLCFGR |= PLLP1_WRITE_MASK;
-				break;
-			case 8:
-				/* 00 is selecting 2 as the devision factor for main sysclk*/
-				RCC->RCC_PLLCFGR |= PLLP0_WRITE_MASK;
-				RCC->RCC_PLLCFGR |= PLLP1_WRITE_MASK;
-				break;
-			default:
-				break;
-		}
+
+
+		/*clk source*/
+		RCC->RCC_PLLCFGR &= PLLSRC_WRITE_MASK;
+		RCC->RCC_PLLCFGR |=((u32)MCopy_clk_Source);
+
+		/*PLLP*/
+		RCC->RCC_PLLCFGR &= PLLP_WRITE_MASK;
+		RCC->RCC_PLLCFGR|=((u32)MCopy_PLLP_factor<<RCC_PLLConfigrationReg_PLLP0);
 
 		/*PLLM*/
 		/*masking and assigning value in register*/
@@ -453,90 +422,28 @@ u8 RCC_ConfigurePLL(RCC_PLL_ClkSource_t MCopy_clk_Source,u8 MCopy_PLLM_factor,u8
 
 
 /*configure prescaler for each peripheral*/
-u8 RCC_ConfigurePrescaler(RCC_peripheral_t MCopy_peripheral ,u16 MCopy_AHBprescalerValue ,u8 MCopy_APBprescalerValue)
+u8 RCC_ConfigurePrescaler(u8 MCopy_APB1prescalerValue ,u8 MCopy_APB2prescalerValue ,u16 MCopy_AHBprescalerValue)
 {
+	u8 LOC_errorStatus=0;
 	/*AHB MUST BE SET AT FIRST AS IT'S AN INPUT TO APB PRESCALER*/
-	switch(MCopy_AHBprescalerValue)
-	{
-		case PRESCALER_1:
-			RCC->RCC_CFGR=(RCC->RCC_CFGR&HPRE_WRITE_MASK)|HPRE_1_WRITE_MASK;
-			break;
-		case PRESCALER_2:
-			RCC->RCC_CFGR=(RCC->RCC_CFGR&HPRE_WRITE_MASK)|HPRE_2_WRITE_MASK;
-			break;
-		case PRESCALER_4:
-			RCC->RCC_CFGR=(RCC->RCC_CFGR&HPRE_WRITE_MASK)|HPRE_4_WRITE_MASK;
-			break;
-		case PRESCALER_8:
-			RCC->RCC_CFGR=(RCC->RCC_CFGR&HPRE_WRITE_MASK)|HPRE_8_WRITE_MASK;
-			break;
-		case PRESCALER_16:
-			RCC->RCC_CFGR=(RCC->RCC_CFGR&HPRE_WRITE_MASK)|HPRE_16_WRITE_MASK;
-			break;
-		case PRESCALER_64:
-			RCC->RCC_CFGR=(RCC->RCC_CFGR&HPRE_WRITE_MASK)|HPRE_64_WRITE_MASK;
-			break;
-		case PRESCALER_128:
-			RCC->RCC_CFGR=(RCC->RCC_CFGR&HPRE_WRITE_MASK)|HPRE_128_WRITE_MASK;
-			break;
-		case PRESCALER_256:
-			RCC->RCC_CFGR=(RCC->RCC_CFGR&HPRE_WRITE_MASK)|HPRE_256_WRITE_MASK;
-			break;
-		case PRESCALER_512:
-			RCC->RCC_CFGR=(RCC->RCC_CFGR&HPRE_WRITE_MASK)|HPRE_512_WRITE_MASK;
-			break;
-	}
+	RCC->RCC_CFGR &= HPRE_WRITE_MASK;
+	RCC->RCC_CFGR |=((u32)MCopy_AHBprescalerValue);
+
 	/*APB1 LOW SPEEDS*/
-	if(MCopy_peripheral>=peripheral_PWR &&MCopy_peripheral<=peripheral_TIM2)
-	{
-		switch(MCopy_APBprescalerValue)
-		{
-			case PRESCALER_1:
-				RCC->RCC_CFGR=(RCC->RCC_CFGR&PPRE1_WRITE_MASK)|(0b000<< RCC_ConfigrationReg_PPRE1);
-				break;
-			case PRESCALER_2:
-				RCC->RCC_CFGR=(RCC->RCC_CFGR&PPRE1_WRITE_MASK)|(0b100<< RCC_ConfigrationReg_PPRE1);
-				break;
-			case PRESCALER_4:
-				RCC->RCC_CFGR=(RCC->RCC_CFGR&PPRE1_WRITE_MASK)|(0b101<< RCC_ConfigrationReg_PPRE1);
-				break;
-			case PRESCALER_8:
-				RCC->RCC_CFGR=(RCC->RCC_CFGR&PPRE1_WRITE_MASK)|(0b110<< RCC_ConfigrationReg_PPRE1);
-				break;
-			case PRESCALER_16:
-				RCC->RCC_CFGR=(RCC->RCC_CFGR&PPRE1_WRITE_MASK)|(0b111<< RCC_ConfigrationReg_PPRE1);
-				break;
-		}
-	}
+	RCC->RCC_CFGR &=PPRE1_WRITE_MASK;
+	RCC->RCC_CFGR |=((u32)MCopy_APB1prescalerValue);
+
 	/*APB2 HIGH SPEEDS*/
-	else if(MCopy_peripheral>=peripheral_TIM11 &&MCopy_peripheral<=peripheral_TIM1)
-	{
-		switch(MCopy_APBprescalerValue)
-		{
-			case PRESCALER_1:
-				RCC->RCC_CFGR=(RCC->RCC_CFGR&PPRE2_WRITE_MASK)|((u32)0b000<< RCC_ConfigrationReg_PPRE2);
-				break;
-			case PRESCALER_2:
-				RCC->RCC_CFGR=(RCC->RCC_CFGR&PPRE2_WRITE_MASK)|(0b100<< RCC_ConfigrationReg_PPRE2);
-				break;
-			case PRESCALER_4:
-				RCC->RCC_CFGR=(RCC->RCC_CFGR&PPRE2_WRITE_MASK)|(0b101<< RCC_ConfigrationReg_PPRE2);
-				break;
-			case PRESCALER_8:
-				RCC->RCC_CFGR=(RCC->RCC_CFGR&PPRE2_WRITE_MASK)|(0b110<< RCC_ConfigrationReg_PPRE2);
-				break;
-			case PRESCALER_16:
-				RCC->RCC_CFGR=(RCC->RCC_CFGR&PPRE2_WRITE_MASK)|(0b111<< RCC_ConfigrationReg_PPRE2);
-				break;
-		}
+	RCC->RCC_CFGR &=PPRE2_WRITE_MASK;
+	RCC->RCC_CFGR |=((u32)MCopy_APB2prescalerValue);
 
-
-	}
+	return LOC_errorStatus;
 }
 
 /*control (on/off) any peripheral*/
 u8 RCC_ControlPeripheral(RCC_peripheral_t MCopy_peripheral ,RCC_peripheral_status_t MCopy_peri_status)
 {
+	u8 LOC_errorStatus=0;
 	switch(MCopy_peripheral)
 	{
 		/*AHB2*/
@@ -685,5 +592,7 @@ u8 RCC_ControlPeripheral(RCC_peripheral_t MCopy_peripheral ,RCC_peripheral_statu
 	{
 
 	}
+
+	return LOC_errorStatus;
 }
 

@@ -213,7 +213,7 @@
 						</tool>
 					</fileInfo>
 					<sourceEntries>
-						<entry excluding="APP/main.c|stm32f4xx_hal_msp.c|_initialize_hardware.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="APP/GPIO_app.c|stm32f4xx_hal_msp.c|_initialize_hardware.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="src/stm32f4-hal|src/stm32f4-hal/stm32f4xx_hal_msp_template.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system"/>
 					</sourceEntries>
 				</configuration>
@@ -419,7 +419,7 @@
 						</tool>
 					</fileInfo>
 					<sourceEntries>
-						<entry excluding="APP/main.c|stm32f4xx_hal_msp.c|_initialize_hardware.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="APP/GPIO_app.c|stm32f4xx_hal_msp.c|_initialize_hardware.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="src/stm32f4-hal|src/stm32f4-hal/stm32f4xx_hal_msp_template.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system"/>
 					</sourceEntries>
 				</configuration>

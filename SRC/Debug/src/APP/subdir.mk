@@ -4,13 +4,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/APP/GPIO_app.c 
+../src/APP/main.c 
 
 OBJS += \
-./src/APP/GPIO_app.o 
+./src/APP/main.o 
 
 C_DEPS += \
-./src/APP/GPIO_app.d 
+./src/APP/main.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
