@@ -36,19 +36,19 @@
 #define APB_PRESCALER_VALUE_16  0xE0
 
 
-#define     PLLP_FACTOR2 0b00
-#define		PLLP_FACTOR4 0b01
-#define		PLLP_FACTOR6 0b10
-#define		PLLP_FACTOR8 0b11
+#define     PLLP_FACTOR2 0x0
+#define		PLLP_FACTOR4 0x10000
+#define		PLLP_FACTOR6 0x20000
+#define		PLLP_FACTOR8 0x30000
 
 #define clk_Source_HSE 0x00400000
 #define clk_Source_HSI 0x00000000
 typedef enum
 {
-	clk_HSE,
-	clk_HSEBYP,
-	clk_HSI,
-	clk_PLL
+	clk_HSE =   0x88000001,
+	clk_HSEBYP =0x88010001,
+	clk_HSI =   0x08000000,
+	clk_PLL=    0xC8000002
 }RCC_clk_t;
 
 typedef enum
@@ -125,7 +125,7 @@ u8 RCC_ConfigureSysclk(RCC_clk_t MCopyclk);
  *@return: Error State.
  */
 /*PLL*N/(M*P)*/
-u8 RCC_ConfigurePLL(u8 MCopy_clk_Source,u8 MCopy_PLLM_factor,u8 MCopy_PLLP_factor,u16 MCopy_PLLN_factor);
+u8 RCC_ConfigurePLL(u32 MCopy_clk_Source,u8 MCopy_PLLM_factor,u8 MCopy_PLLP_factor,u16 MCopy_PLLN_factor);
 u8 RCC_ControlPeripheral(RCC_peripheral_t MCopy_peripheral ,RCC_peripheral_status_t MCopy_peri_status);
 
 /**

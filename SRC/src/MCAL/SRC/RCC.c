@@ -177,7 +177,8 @@
 #define PLLQ2_WRITE_MASK  0x4000000
 #define PLLQ3_WRITE_MASK  0x8000000
 
-
+#define SYS_CLK_MASK        0x3
+#define READY_FLAG_BIT_MASK 0xF8000000
 
 typedef struct
 {
@@ -295,70 +296,28 @@ u8 RCC_ControlClk(RCC_clk_t MCopy_clk ,RCC_clk_Status_t MCopy_clk_Status)
 	return LOC_errorStatus;
 }
 
-
 u8 RCC_ConfigureSysclk(RCC_clk_t MCopyclk)
 {
 	u8 LOC_errorStatus=0;
 	u16 LOC_time_out=1000;
+	u8 LOC_ReadyFlagBit=0;
+	u8 LOC_sysClk=0;
+	/*extract last 2 digit in hex to get the bit num to shift to to check if the clk ready or not*/
+	LOC_ReadyFlagBit=(u32)READY_FLAG_BIT_MASK & MCopyclk;
+	LOC_ReadyFlagBit=LOC_ReadyFlagBit>>24;
+	/*extract first digit in hex to get the chosen sysClk*/
+	LOC_sysClk=MCopyclk&(u32)SYS_CLK_MASK;
+	while(!(1&(RCC->RCC_CR>>LOC_ReadyFlagBit))&&LOC_time_out)
+		{
+			LOC_time_out--;
+		}
+	if ((1&(RCC->RCC_CR>>RCC_controlReg_HSIRDY))==1)
+		{
+			/*00 is selecting HSI as sysclk*/
+			RCC->RCC_CFGR &= SW_WRITE_MASK;
+			RCC->RCC_CFGR |=(u32)LOC_sysClk;
+		}
 
-	switch(MCopyclk)
-	{
-		case clk_HSI:
-			/*wait till ready flag is set then choose it as sysclk*/
-			while(!(1&(RCC->RCC_CR>>RCC_controlReg_HSIRDY))&&LOC_time_out)
-			{
-				LOC_time_out--;
-			}
-			if ((1&(RCC->RCC_CR>>RCC_controlReg_HSIRDY))==1)
-			{
-				/*00 is selecting HSI as sysclk*/
-				RCC->RCC_CFGR &=SW_WRITE_MASK;
-				RCC->RCC_CFGR|=0x00000000;
-			}
-			break;
-
-		case clk_HSE:
-			while(!(1&(RCC->RCC_CR>>RCC_controlReg_HSERDY))&&LOC_time_out)
-			{
-				LOC_time_out--;
-			}
-			if ((1&(RCC->RCC_CR>>RCC_controlReg_HSERDY))==1)
-			{
-				/*01 is selecting HSE as sysclk*/
-				RCC->RCC_CFGR &=SW_WRITE_MASK;
-				RCC->RCC_CFGR |=0x00000001;
-			}
-			break;
-
-		case clk_HSEBYP:
-			while(!(1&(RCC->RCC_CR>>RCC_controlReg_HSERDY))&&LOC_time_out)
-			{
-				LOC_time_out--;
-			}
-			if ((1&(RCC->RCC_CR>>RCC_controlReg_HSERDY))==1)
-			{
-				/*01 is selecting HSEBYP as sysclk*/
-				RCC->RCC_CFGR &=SW_WRITE_MASK;
-				RCC->RCC_CFGR |=0x00000001;
-			}
-			break;
-
-		case clk_PLL:
-			while(!(1&(RCC->RCC_CR>>RCC_controlReg_PLLRDY))&&LOC_time_out)
-			{
-				LOC_time_out--;
-			}
-			if ((1&(RCC->RCC_CR>>RCC_controlReg_PLLRDY))==1)
-			{
-				/*10 is selecting PLL as sysclk*/
-				RCC->RCC_CFGR &=SW_WRITE_MASK;
-				RCC->RCC_CFGR|=0x00000002;
-			}
-			break;
-
-		default:
-			break;
-	}
 	/*if sw is 11 then return not applicable*/
 	/*if ()
 	{
@@ -370,7 +329,7 @@ u8 RCC_ConfigureSysclk(RCC_clk_t MCopyclk)
 	return LOC_errorStatus;
 }
 
-u8 RCC_ConfigurePLL(u8 MCopy_clk_Source,u8 MCopy_PLLM_factor,u8 MCopy_PLLP_factor,u16 MCopy_PLLN_factor)
+u8 RCC_ConfigurePLL(u32 MCopy_clk_Source,u8 MCopy_PLLM_factor,u8 MCopy_PLLP_factor,u16 MCopy_PLLN_factor)
 {
 	u8 LOC_errorStatus=0;
 	u8 Sysclk_reading0;
@@ -398,16 +357,16 @@ u8 RCC_ConfigurePLL(u8 MCopy_clk_Source,u8 MCopy_PLLM_factor,u8 MCopy_PLLP_facto
 
 		/*clk source*/
 		RCC->RCC_PLLCFGR &= PLLSRC_WRITE_MASK;
-		RCC->RCC_PLLCFGR |=((u32)MCopy_clk_Source);
+		RCC->RCC_PLLCFGR |=MCopy_clk_Source;
 
 		/*PLLP*/
 		RCC->RCC_PLLCFGR &= PLLP_WRITE_MASK;
-		RCC->RCC_PLLCFGR|=((u32)MCopy_PLLP_factor<<RCC_PLLConfigrationReg_PLLP0);
+		RCC->RCC_PLLCFGR |=(u32)MCopy_PLLP_factor;
 
 		/*PLLM*/
 		/*masking and assigning value in register*/
 		RCC->RCC_PLLCFGR &= PLLM_WRITE_MASK;
-		RCC->RCC_PLLCFGR|=(u32)MCopy_PLLM_factor;
+		RCC->RCC_PLLCFGR |=(u32)MCopy_PLLM_factor;
 		/*PLLN*/
 		/*masking and assigning value in register*/
 		RCC->RCC_PLLCFGR &=PLLN_WRITE_MASK;
