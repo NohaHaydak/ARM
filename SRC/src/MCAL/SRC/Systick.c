@@ -95,18 +95,36 @@ u8 MSTK_setTime_ms(u16 copy_STKtime)
     return error_status;
 }
 
-void Systick_Handler(STK_CB_t STK_CB)
+void MSTK_SetCallBack(STK_CB_t STK_CB)
 {
     if(STK_CB!=NULL)
     {
         AppCbF=STK_CB;
     }
-    if (G_STKmode==STKmode_SINGLE)
+    else
     {
-        //clear reload value and  count enable bits
-        STK->STK_CTRL&=~(STK_CTRL_ENABLE_MASK);
-        STK->STK_LOAD&=STK_LOAD_CLR_MASK;
+        //do nothing
     }
+
+}
+
+void Systick_Handler(void)
+{
+    if(Systick_Handler!=NULL)
+    {
+    	Systick_Handler();
+    	if (G_STKmode==STKmode_SINGLE)
+    	    {
+    	        //clear reload value and  count enable bits
+    	        STK->STK_CTRL&=~(STK_CTRL_ENABLE_MASK);
+    	        STK->STK_LOAD&=STK_LOAD_CLR_MASK;
+    	    }
+    	else
+    	{
+    		//do nothing
+    	}
+    }
+
     else
     {
         //do nothing

@@ -25,7 +25,7 @@ u8 MSTK_stop(void);
 u8 MSTK_setTime_ms(u16 copy_STKtime);
 u8 MSTK_IsExpired(u8* Add_STKisExpired);
 u8 MSTK_IsExpired(u8* Add_STKisExpired);
-
+void MSTK_SetCallBack(STK_CB_t STK_CB);
 
 
 #endif /* MCAL_INCLUDES_SYSTICK_H_ */
