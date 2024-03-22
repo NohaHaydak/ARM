@@ -5,15 +5,21 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../src/MCAL/SRC/GPIO.c \
-../src/MCAL/SRC/RCC.c 
+../src/MCAL/SRC/NVIC.c \
+../src/MCAL/SRC/RCC.c \
+../src/MCAL/SRC/Systick.c 
 
 OBJS += \
 ./src/MCAL/SRC/GPIO.o \
-./src/MCAL/SRC/RCC.o 
+./src/MCAL/SRC/NVIC.o \
+./src/MCAL/SRC/RCC.o \
+./src/MCAL/SRC/Systick.o 
 
 C_DEPS += \
 ./src/MCAL/SRC/GPIO.d \
-./src/MCAL/SRC/RCC.d 
+./src/MCAL/SRC/NVIC.d \
+./src/MCAL/SRC/RCC.d \
+./src/MCAL/SRC/Systick.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
