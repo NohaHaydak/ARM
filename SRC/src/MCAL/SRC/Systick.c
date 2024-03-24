@@ -45,17 +45,14 @@ static STK_CB_t AppCbF;
 u8 G_STKmode=0;
 f32 G_STK_freq=0;
 
-//asynchronous func as interrupt is enabled
-u8 MSTK_start(u8 copy_STKmode)
+u8 MSTK_init(u8 copy_STKmode)
 {
-    u8 error_status;
-
-    #if STK_CLK==STKclk_AHB
-    /*systick clk source*/
-    STK->STK_CTRL&=STKclk_MASK;
-    STK->STK_CTRL|=STKclk_AHB;
-    G_STK_freq=STK_CLKFREQ;
-
+	u8 error_status;
+	#if STK_CLK==STKclk_AHB
+	/*systick clk source*/
+	STK->STK_CTRL&=STKclk_MASK;
+	STK->STK_CTRL|=STKclk_AHB;
+	G_STK_freq=STK_CLKFREQ;
     #elif STK_CLK==STKclk_AHB8
     /*systick clk source*/
     STK->STK_CTRL&=STKclk_MASK;
@@ -65,6 +62,13 @@ u8 MSTK_start(u8 copy_STKmode)
     G_STKmode=copy_STKmode;
     //enable counter by setting bit 0 and raise COUNTFLAG
     STK->STK_CTRL|=STK_CTRL_ENABLE_MASK;
+    return error_status;
+
+}
+//asynchronous func as interrupt is enabled
+u8 MSTK_start(void)
+{
+    u8 error_status;
     //enable SYSTICK to detect COUNTFLAG
     STK->STK_CTRL|=STK_CTRL_TICKINT_MASK;
     return error_status;
@@ -113,7 +117,7 @@ void Systick_Handler(void)
     if(Systick_Handler!=NULL)
     {
     	AppCbF();
-    	if (G_STKmode==STKmode_SINGLE)
+    	if (G_STKmode==STK_MODE_SINGLE)
     	    {
     	        //clear reload value and  count enable bits
     	        STK->STK_CTRL&=~(STK_CTRL_ENABLE_MASK);

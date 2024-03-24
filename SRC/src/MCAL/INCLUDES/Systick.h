@@ -12,15 +12,15 @@
 #include"../../LIB/std_types.h"
 #include"systick_cfg.h"
 
-#define STKmode_PERIODIC 1
-#define STKmode_SINGLE   0
+#define STK_MODE_PERIODIC 1
+#define STK_MODE_SINGLE   0
 
 
 
 typedef void (*STK_CB_t) (void);
 
-
-u8 MSTK_start(u8 copy_STKmode);
+u8 MSTK_init(void);
+u8 MSTK_init(u8 copy_STKmode);
 u8 MSTK_stop(void);
 u8 MSTK_setTime_ms(u16 copy_STKtime);
 u8 MSTK_IsExpired(u8* Add_STKisExpired);

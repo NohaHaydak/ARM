@@ -11,7 +11,7 @@
 #define STKclk_AHB8 0x0
 #define STKclk_AHB  0x4
 #define STK_CLK     STKclk_AHB
-#define STK_CLKFREQ 16000000
+#define STK_CLKFREQ 16000000UL
 
 
 #endif /* MCAL_INCLUDES_SYSTICK_CFG_H_ */
