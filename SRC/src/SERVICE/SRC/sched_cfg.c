@@ -5,8 +5,10 @@
  *      Author: Noha
  */
 
-#include "../INCLUDES/sched.h"
-
+#include "../INCLUDES/sched_cfg.h"
+void ToggleGreenLed(void);
+void ToggleYellowLed(void);
+void ToggleRedLed(void);
 const runnable_t runnables[NUM_OF_RUNNABLES]=
 {
     [FIRST_RUNNABLE]={.name="greenLed", .firstDelayMs=400 , .periodicityMs=200, .cb=ToggleGreenLed },

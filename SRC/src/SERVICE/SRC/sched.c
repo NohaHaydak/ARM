@@ -5,9 +5,8 @@
  *      Author: Noha
  */
 
-#include "sched.h"
-#include "sched_cfg.h"
-#include "systick.h"
+#include "../INCLUDES/sched_cfg.h"
+#include "../../MCAL/INCLUDES/systick.h"
 
 
 extern const runnable_t runnables[NUM_OF_RUNNABLES];

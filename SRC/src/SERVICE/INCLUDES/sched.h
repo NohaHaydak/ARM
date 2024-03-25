@@ -6,8 +6,8 @@
  */
 #ifndef SERVICE_INCLUDES_SCHED_H_
 #define SERVICE_INCLUDES_SCHED_H_
-#include "sched_cfg.h"
-
+#include"stdio.h"
+#include"../../LIB/std_types.h"
 typedef void(* runnableCb_t) (void);
 typedef struct
 {

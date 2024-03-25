@@ -8,9 +8,7 @@
 #ifndef SERVICE_INCLUDES_SCHED_CFG_H_
 #define SERVICE_INCLUDES_SCHED_CFG_H_
 
-#include"stdio.h"
-#include"../LIB/std_types.h"
-
+#include "sched.h"
 #define FIRST_RUNNABLE  0
 #define SECOND_RUNNABLE 1
 #define THIRD_RUNNABLE  2

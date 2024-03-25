@@ -47,7 +47,7 @@ f32 G_STK_freq=0;
 
 u8 MSTK_init(u8 copy_STKmode)
 {
-	u8 error_status;
+	u8 error_status=STATUS_NOK;
 	#if STK_CLK==STKclk_AHB
 	/*systick clk source*/
 	STK->STK_CTRL&=STKclk_MASK;
@@ -59,44 +59,57 @@ u8 MSTK_init(u8 copy_STKmode)
     STK->STK_CTRL|=STKclk_AHB8;
     G_STK_freq=STK_CLKFREQ/8;
     #endif
-    G_STKmode=copy_STKmode;
-    //enable counter by setting bit 0 and raise COUNTFLAG
+
+    if(copy_STKmode>STK_MODE_PERIODIC)
+	{
+		error_status=INVALID_MODE;
+	}
+    else
+    {
+    	G_STKmode=copy_STKmode;
+    	error_status=STATUS_OK;
+    }
+	//enable counter by setting bit 0 and raise COUNTFLAG
     STK->STK_CTRL|=STK_CTRL_ENABLE_MASK;
+
     return error_status;
 
 }
 //asynchronous func as interrupt is enabled
-u8 MSTK_start(void)
+void MSTK_start(void)
 {
-    u8 error_status;
     //enable SYSTICK to detect COUNTFLAG
     STK->STK_CTRL|=STK_CTRL_TICKINT_MASK;
-    return error_status;
 }
 
-u8 MSTK_stop(void)
+void MSTK_stop(void)
 {
-    u8 error_status;
     //disable counter
     STK->STK_CTRL&=~(STK_CTRL_ENABLE_MASK);
     //disable SYSTICK
     STK->STK_CTRL&=~(STK_CTRL_TICKINT_MASK);
-    return error_status;
 }
 u8 MSTK_IsExpired(u8* Add_STKisExpired)
 {
-    u8 error_status;
-    * Add_STKisExpired=(STK->STK_CTRL>>STK_CTRL_COUNTFLAG)&1;
+    u8 error_status=STATUS_NOK;
+    if(Add_STKisExpired!=NULL)
+    {
+    	* Add_STKisExpired=(STK->STK_CTRL>>STK_CTRL_COUNTFLAG)&1;
+    	error_status=STATUS_OK;
+    }
+    else
+    {
+    	error_status=STATUS_NOK;
+    }
+
     return error_status;
 }
-u8 MSTK_setTime_ms(u16 copy_STKtime)
+void MSTK_setTime_ms(u16 copy_STKtime)
 {
-    u8 error_status;
     u32 Loc_numOfTicks;
     Loc_numOfTicks=copy_STKtime/(1000/G_STK_freq);
     STK->STK_LOAD&=STK_LOAD_CLR_MASK;
     STK->STK_LOAD|=Loc_numOfTicks;
-    return error_status;
 }
 
 void MSTK_SetCallBack(STK_CB_t STK_CB)
