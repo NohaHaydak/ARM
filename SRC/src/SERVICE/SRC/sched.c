@@ -14,6 +14,12 @@ extern const runnable_t runnables[NUM_OF_RUNNABLES];
 extern u32 G_STK_freq;
 static runnableRInfo_t runnableRInfo[NUM_OF_RUNNABLES];
 static void sched(void);
+static void ticksCb(void);
+static u32 pendingTicks=0;
+void ticksCb(void)
+{
+	pendingTicks++;
+}
 void sched_init(void)
 {
     u32 itr;
@@ -27,7 +33,7 @@ void sched_init(void)
     }
     MSTK_init(STK_MODE_PERIODIC);
     MSTK_setTime_ms(1);
-    MSTK_SetCallBack(sched);
+    MSTK_SetCallBack(ticksCb);
     sched_start();
 }
 
@@ -36,7 +42,8 @@ void sched_start(void)
     MSTK_start();
     while (1);
     {
-
+    	pendingTicks--;
+    	sched();
     }
 
 }
