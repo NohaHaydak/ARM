@@ -17,16 +17,15 @@ typedef struct
     u32 NVIC_ISPR[32];
     u32 reserved2[32];
     u32 NVIC_ICPR[32];
-    u32 NVIC_IABR[62];
+    u32 NVIC_IABR[64];
     u8  NVIC_IPR[240];
-    u32 Reserved[580];
+    u32 Reserved[644];
     u32 NVIC_STIR;
 }NVIC_t;
 
 
 typedef struct
 {
-    u32 SCB_ACTLR;
     u32 SCB_CPUID;
     u32 SCB_ICSR;
     u32 SCB_VTOR;
@@ -49,7 +48,7 @@ typedef struct
 
 
 static NVIC_t volatile *const NVIC =((NVIC_t volatile *const )0xE000E100);
-static SCB_t volatile *const SCB =((SCB_t volatile *const )0xE000E008);
+static SCB_t volatile *const SCB =((SCB_t volatile *const )0xE000ED00);
 
 u8 NVIC_EnablePriINTR(u8 MCopy_interruptiID)
 {
@@ -64,7 +63,7 @@ u8 NVIC_EnablePriINTR(u8 MCopy_interruptiID)
     else
     {
         //clr pending at first
-        NVIC->NVIC_ICPR[local_RegNum]=(1<<local_BitNum);
+        //NVIC->NVIC_ICPR[local_RegNum]=(1<<local_BitNum);
         //enable intr
         NVIC->NVIC_ISER[local_RegNum]=(1<<local_BitNum);
         Local_errorStatus= STATUS_OK;
@@ -148,44 +147,62 @@ u8 NVIC_GetActiveStatus(u8 MCopy_interruptiID, u8*MCopy_Status)
 u8 NVIC_SetPriority(u8 MCopy_interruptiID ,u8 MCopy_GroupPriorityNum , u8 MCopy_subgroupNum)
 {
     u8 Local_errorStatus;
+    u8 Local_GroupPriority;
+    u8 Local_subgroupNum;
+    u8 Local_Priority;
 	#if PRIORITY_CONFIGURATION==FOUR_BIT_GROUP_NO_SUBGROUB
-    u32 Local_PriorityConfiguration= ((FOUR_BIT_GROUP_NO_SUBGROUB-0x05FA000)/256)>>8;
+    u32 Local_PriorityConfiguration= (FOUR_BIT_GROUP_NO_SUBGROUB-0x05FA0300)>>8;
 	#elif PRIORITY_CONFIGURATION==THREE_BIT_GROUP_ONE_SUBGROUB
-    u32 Local_PriorityConfiguration= ((THREE_BIT_GROUP_ONE_SUBGROUB-0x05FA000)/256)>>8;
+    u32 Local_PriorityConfiguration= (THREE_BIT_GROUP_ONE_SUBGROUB-0x05FA0300)>>8;
 	#elif PRIORITY_CONFIGURATION==TWO_BIT_GROUP_TWO_SUBGROUB
-    u32 Local_PriorityConfiguration= ((TWO_BIT_GROUP_TWO_SUBGROUB-0x05FA000)/256)>>8;
+    u32 Local_PriorityConfiguration= (TWO_BIT_GROUP_TWO_SUBGROUB-0x05FA0300)>>8;
 	#elif PRIORITY_CONFIGURATION==ONE_BIT_GROUP_THREE_SUBGROUB
-    u32 Local_PriorityConfiguration= ((ONE_BIT_GROUP_THREE_SUBGROUB-0x05FA000)/256)>>8;
+    u32 Local_PriorityConfiguration= (ONE_BIT_GROUP_THREE_SUBGROUB-0x05FA0300)>>8;
 	#elif PRIORITY_CONFIGURATION==NO_BIT_GROUP_FOUR_SUBGROUB
-    u32 Local_PriorityConfiguration= ((NO_BIT_GROUP_FOUR_SUBGROUB-0x05FA000)/256)>>8;
+    u32 Local_PriorityConfiguration= (NO_BIT_GROUP_FOUR_SUBGROUB-0x05FA0300)>>8;
 	#endif
-    u8 Local_GroupPriority=(MCopy_GroupPriorityNum<<OFFESET_FOUR)<<Local_PriorityConfiguration;
-    u8 Local_subgroupNum=MCopy_subgroupNum<<OFFESET_FOUR;
-    u8 Local_Priority=Local_GroupPriority&Local_subgroupNum;
 
-    if(Local_Priority>15||Local_PriorityConfiguration>4||Local_Priority<MCopy_GroupPriorityNum)
+
+	#if PRIORITY_CONFIGURATION==FOUR_BIT_GROUP_NO_SUBGROUB
+    SCB->SCB_AIRCR=FOUR_BIT_GROUP_NO_SUBGROUB;
+	#elif PRIORITY_CONFIGURATION==THREE_BIT_GROUP_ONE_SUBGROUB
+    SCB->SCB_AIRCR=THREE_BIT_GROUP_ONE_SUBGROUB;
+	#elif PRIORITY_CONFIGURATION==TWO_BIT_GROUP_TWO_SUBGROUB
+    SCB->SCB_AIRCR=TWO_BIT_GROUP_TWO_SUBGROUB;
+	#elif PRIORITY_CONFIGURATION==ONE_BIT_GROUP_THREE_SUBGROUB
+    SCB->SCB_AIRCR=ONE_BIT_GROUP_THREE_SUBGROUB;
+	#elif PRIORITY_CONFIGURATION==NO_BIT_GROUP_FOUR_SUBGROUB
+    SCB->SCB_AIRCR=NO_BIT_GROUP_FOUR_SUBGROUB;
+	#endif
+
+
+    //240=15<<4
+    if(Local_Priority>240 && Local_PriorityConfiguration>4)
     {
-        Local_errorStatus= WRONG_PRIORITY_CFG;
+            Local_errorStatus= WRONG_PRIORITY_CFG;
     }
     else
     {
-        SCB->SCB_ACTLR&=SCB_AIRCR_CLR_MASK;
-
-		#if PRIORITY_CONFIGURATION==FOUR_BIT_GROUP_NO_SUBGROUB
-        SCB->SCB_ACTLR|=FOUR_BIT_GROUP_NO_SUBGROUB;
-		#elif PRIORITY_CONFIGURATION==THREE_BIT_GROUP_ONE_SUBGROUB
-        SCB->SCB_ACTLR|=THREE_BIT_GROUP_ONE_SUBGROUB;
-		#elif PRIORITY_CONFIGURATION==TWO_BIT_GROUP_TWO_SUBGROUB
-        SCB->SCB_ACTLR|=TWO_BIT_GROUP_TWO_SUBGROUB;
-		#elif PRIORITY_CONFIGURATION==ONE_BIT_GROUP_THREE_SUBGROUB
-        SCB->SCB_ACTLR|=ONE_BIT_GROUP_THREE_SUBGROUB;
-		#elif PRIORITY_CONFIGURATION==NO_BIT_GROUP_FOUR_SUBGROUB
-        SCB->SCB_ACTLR|=NO_BIT_GROUP_FOUR_SUBGROUB;
-		#endif
-
-        NVIC->NVIC_IPR[MCopy_interruptiID]|=Local_Priority;
-
+    	    if(MCopy_subgroupNum==NO_SUBGROUP)
+    	    {
+    	    	Local_GroupPriority=(MCopy_GroupPriorityNum<<OFFESET_FOUR);
+    	    	Local_Priority=Local_GroupPriority;
+    	    }
+    	    else if(MCopy_GroupPriorityNum==NO_GROUP)
+    	    {
+    	    	Local_Priority=MCopy_subgroupNum<<OFFESET_FOUR;
+    	    }
+    	    else
+    	    {
+    	    	Local_GroupPriority=(MCopy_GroupPriorityNum<<OFFESET_FOUR)<<Local_PriorityConfiguration;
+    	    	Local_subgroupNum=MCopy_subgroupNum<<OFFESET_FOUR;
+    	    	Local_Priority=Local_GroupPriority|Local_subgroupNum;
+    	    }
+    	    //clr IPR first
+    	    NVIC->NVIC_IPR[MCopy_interruptiID]&=0x0;
+    	    NVIC->NVIC_IPR[MCopy_interruptiID]|=Local_Priority;
     }
+
     return Local_errorStatus;
 }
 

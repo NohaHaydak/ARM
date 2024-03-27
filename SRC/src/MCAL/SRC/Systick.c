@@ -127,15 +127,15 @@ void MSTK_SetCallBack(STK_CB_t STK_CB)
 
 void Systick_Handler(void)
 {
-    if(Systick_Handler!=NULL)
+    if(AppCbF)
     {
     	AppCbF();
     	if (G_STKmode==STK_MODE_SINGLE)
-    	    {
-    	        //clear reload value and  count enable bits
-    	        STK->STK_CTRL&=~(STK_CTRL_ENABLE_MASK);
-    	        STK->STK_LOAD&=STK_LOAD_CLR_MASK;
-    	    }
+    	{
+    	    //clear reload value and  count enable bits
+    	    STK->STK_CTRL&=~(STK_CTRL_ENABLE_MASK);
+            STK->STK_LOAD&=STK_LOAD_CLR_MASK;
+   	    }
     	else
     	{
     		//do nothing
