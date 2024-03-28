@@ -17,6 +17,7 @@
 #define EXCEDED_ALLAOWED_INTRNUM 0
 #define STATUS_OK 1
 #define WRONG_PRIORITY_CFG 2
+#define NOT_ALLOWED 3
 
 
 
@@ -24,6 +25,7 @@
 #define NO_GROUP 100
 #define NO_SUBGROUP 100
 
+#define PRIORITY_NUM_15 240
 
 u8 NVIC_EnablePriINTR(u8 MCopy_interruptiID);
 u8 NVIC_DisablePriINTR(u8 MCopy_interruptiID);

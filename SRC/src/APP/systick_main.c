@@ -17,9 +17,9 @@ void main(void)
 	RCC_ControlPeripheral(peripheral_GPIOA,peri_status_enabled);
 	LED_init();
 	MSTK_init(STK_MODE_PERIODIC);
-	MSTK_start();
 	MSTK_setTime_ms(200);
 	MSTK_SetCallBack(LedOn);
+	MSTK_start();
 	APBprescalerValue=2;
 	while(1)
 	{
@@ -30,5 +30,5 @@ void main(void)
 
 void LedOn (void)
 {
-	LED_setState(led_2, LED_ON );
+	LED_setState(led_1, LED_ON);
 }

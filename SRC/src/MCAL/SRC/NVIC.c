@@ -15,7 +15,6 @@ typedef struct
     u32 NVIC_ISER[32];
     u32 NVIC_ICER[32];
     u32 NVIC_ISPR[32];
-    u32 reserved2[32];
     u32 NVIC_ICPR[32];
     u32 NVIC_IABR[64];
     u8  NVIC_IPR[240];
@@ -93,9 +92,15 @@ u8 NVIC_SetPendingForSw_INTR(u8 MCopy_interruptiID)
     u8 local_BitNum=MCopy_interruptiID%32;
     u8 local_RegNum=MCopy_interruptiID/32;
     u8 Local_errorStatus;
+    u8 Local_InterruptState=NVIC->NVIC_ISER[local_RegNum];
+
     if(MCopy_interruptiID>INTR_NUMS)
     {
         Local_errorStatus=EXCEDED_ALLAOWED_INTRNUM;
+    }
+    else if(Local_InterruptState==1)
+    {
+    	Local_errorStatus=NOT_ALLOWED;
     }
     else
     {
@@ -111,7 +116,6 @@ u8 NVIC_ClrPending(u8 MCopy_interruptiID)
     u8 local_BitNum=MCopy_interruptiID%32;
     u8 local_RegNum=MCopy_interruptiID/32;
     u8 Local_errorStatus;
-
     if(MCopy_interruptiID>INTR_NUMS)
     {
         Local_errorStatus=EXCEDED_ALLAOWED_INTRNUM;
@@ -176,8 +180,7 @@ u8 NVIC_SetPriority(u8 MCopy_interruptiID ,u8 MCopy_GroupPriorityNum , u8 MCopy_
 	#endif
 
 
-    //240=15<<4
-    if(Local_Priority>240 && Local_PriorityConfiguration>4)
+    if(Local_Priority>PRIORITY_NUM_15 && Local_PriorityConfiguration>4)
     {
             Local_errorStatus= WRONG_PRIORITY_CFG;
     }
@@ -199,8 +202,8 @@ u8 NVIC_SetPriority(u8 MCopy_interruptiID ,u8 MCopy_GroupPriorityNum , u8 MCopy_
     	    	Local_Priority=Local_GroupPriority|Local_subgroupNum;
     	    }
     	    //clr IPR first
-    	    NVIC->NVIC_IPR[MCopy_interruptiID]&=0x0;
-    	    NVIC->NVIC_IPR[MCopy_interruptiID]|=Local_Priority;
+    	    //NVIC->NVIC_IPR[MCopy_interruptiID]&=0x0;
+    	    NVIC->NVIC_IPR[MCopy_interruptiID]=Local_Priority;
     }
 
     return Local_errorStatus;
@@ -218,6 +221,7 @@ u8 NVIC_TriggerTntrBySoftware(u8 MCopy_interruptiID)
     {
         //trigger specific peri interrupt using s.w
         NVIC->NVIC_STIR|=(1<<MCopy_interruptiID);
+
         Local_errorStatus= STATUS_OK;
     }
     return  Local_errorStatus;

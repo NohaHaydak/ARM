@@ -20,7 +20,7 @@
 
 
 #define STK_CTRL_ENABLE_MASK    0x1
-#define STK_CTRL_TICKINT_MASK   0x2
+#define STK_CTRL_TICKINT_MASK   0x3
 #define STK_CTRL_CLKSOURCE_MASK 0x4
 #define STK_CTRL_COUNTFLAG_MASK 0x10000
 
@@ -70,7 +70,7 @@ u8 MSTK_init(u8 copy_STKmode)
     	error_status=STATUS_OK;
     }
 	//enable counter by setting bit 0 and raise COUNTFLAG
-    STK->STK_CTRL|=STK_CTRL_ENABLE_MASK;
+    //STK->STK_CTRL|=STK_CTRL_ENABLE_MASK;
 
     return error_status;
 
