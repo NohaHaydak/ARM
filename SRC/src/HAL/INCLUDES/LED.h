@@ -35,4 +35,6 @@ u8 LED_init(void);
 /*here we set the state and connection*/
 u8 LED_setState(u32 Copy_led, u8 Copy_state );
 
+u8 LED_toggleLed(u32 Copy_led);
+
 #endif /* HAL_INCLUDES_LED_H_ */
