@@ -10,8 +10,8 @@
 
 const LED_cfg_t leds[NUM_OF_LEDS]=
 {
-	[led_1]={.port= GPIOA, .pin=GPIO_PIN_NUM0, .connection=CONNECTION_FORWARD,.state=VALUE_SET_HIGH},
+	[led_1]={.port= GPIOB, .pin=GPIO_PIN_NUM2, .connection=CONNECTION_FORWARD,.state=VALUE_SET_HIGH},
 	[led_2]={.port= GPIOA, .pin=GPIO_PIN_NUM1, .connection=CONNECTION_FORWARD,.state=VALUE_SET_LOW},
-	[led_3]={.port= GPIOB, .pin=GPIO_PIN_NUM0, .connection=CONNECTION_FORWARD,.state=VALUE_SET_HIGH}
+	[led_3]={.port= GPIOA, .pin=GPIO_PIN_NUM2, .connection=CONNECTION_FORWARD,.state=VALUE_SET_HIGH}
 };
 

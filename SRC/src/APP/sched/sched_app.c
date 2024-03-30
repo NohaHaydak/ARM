@@ -12,23 +12,23 @@ void ToggleRedLed(void);
 
 void ToggleGreenLed(void)
 {
-	LED_setState(led_1, LED_ON );
-	LED_setState(led_2, LED_OFF );
-	LED_setState(led_3, LED_OFF );
+	//LED_setState(led_1, LED_ON );
+	LED_toggleLed(led_1);
+
 }
 
 void ToggleYellowLed(void)
 {
 
-	LED_setState(led_2, LED_ON );
-	LED_setState(led_1, LED_OFF );
-	LED_setState(led_3, LED_OFF );
+	//LED_setState(led_3, LED_ON );
+	LED_toggleLed(led_3);
 }
 
 void ToggleRedLed(void)
 {
-	LED_setState(led_3, LED_ON );
-	LED_setState(led_2, LED_OFF );
-	LED_setState(led_1, LED_OFF );
+	//LED_setState(led_2, LED_ON );
+	LED_toggleLed(led_2);
+
 }
+
 

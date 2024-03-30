@@ -35,6 +35,7 @@ u8 LED_toggleLed(u32 Copy_led)
 	u8 Loc_ledState=0;
 	GPIO_getPinValue(leds[Copy_led].port,leds[Copy_led].pin,&Loc_ledState);
 	Loc_ledState^=1;
+	LED_setState(Copy_led, Loc_ledState);
 	return errorStatus;
 }
 

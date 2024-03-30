@@ -125,11 +125,12 @@ void MSTK_SetCallBack(STK_CB_t STK_CB)
 
 }
 
-void Systick_Handler(void)
+void SysTick_Handler(void)
 {
     if(AppCbF)
     {
     	AppCbF();
+
     	if (G_STKmode==STK_MODE_SINGLE)
     	{
     	    //clear reload value and  count enable bits

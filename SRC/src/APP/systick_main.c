@@ -13,8 +13,8 @@ void main(void)
 {
 	u16 AHBprescalerValue=2;
 	u8 APBprescalerValue=2;
-	RCC_ConfigurePrescaler(peripheral_GPIOA ,AHBprescalerValue,APBprescalerValue);
-	RCC_ControlPeripheral(peripheral_GPIOA,peri_status_enabled);
+	RCC_ConfigurePrescaler(peripheral_GPIOB ,AHBprescalerValue,APBprescalerValue);
+	RCC_ControlPeripheral(peripheral_GPIOB,peri_status_enabled);
 	LED_init();
 	MSTK_init(STK_MODE_PERIODIC);
 	MSTK_setTime_ms(200);
@@ -30,5 +30,5 @@ void main(void)
 
 void LedOn (void)
 {
-	LED_setState(led_1, LED_ON);
+	LED_toggleLed(led_3);
 }
