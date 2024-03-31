@@ -24,7 +24,7 @@ typedef void (*STK_CB_t) (void);
 void MSTK_start(void);
 u8 MSTK_init(u8 copy_STKmode);
 void MSTK_stop(void);
-void MSTK_setTime_ms(u16 copy_STKtime);
+void MSTK_setTime_ms(u32 copy_STKtime);
 u8 MSTK_IsExpired(u8* Add_STKisExpired);
 void MSTK_SetCallBack(STK_CB_t STK_CB);
 

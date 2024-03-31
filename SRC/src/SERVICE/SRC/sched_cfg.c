@@ -9,9 +9,10 @@
 extern void ToggleGreenLed(void);
 extern void ToggleYellowLed(void);
 extern void ToggleRedLed(void);
+extern void trafficLight_runnable(void);
 const runnable_t runnables[NUM_OF_RUNNABLES]=
 {
-	[FIRST_RUNNABLE]={.name="redLed", .firstDelayMs=0 , .periodicityMs=200, .cb=ToggleRedLed },
+	[FIRST_RUNNABLE]={.name="redLed", .firstDelayMs=0 , .periodicityMs=2, .cb=trafficLight_runnable }/*,
 	[SECOND_RUNNABLE]={.name="greenLed", .firstDelayMs=400 , .periodicityMs=200, .cb=ToggleGreenLed },
-    [THIRD_RUNNABLE]={.name="yellowLed", .firstDelayMs=200 , .periodicityMs=200, .cb=ToggleYellowLed }
+    [THIRD_RUNNABLE]={.name="yellowLed", .firstDelayMs=200 , .periodicityMs=200, .cb=ToggleYellowLed }*/
 };

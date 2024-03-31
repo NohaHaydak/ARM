@@ -17,8 +17,8 @@
 
 typedef struct
 {
-    runnable_t runnable;
-    u32 reamainingTime;
+    runnable_t*runnable;
+    u32 remainingTime;
 }runnableRInfo_t;
 
 

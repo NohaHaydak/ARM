@@ -1,24 +1,25 @@
 /*
- * systick_main.c
+ * Systick_msin.c
  *
- *  Created on: Mar 27, 2024
+ *  Created on: Mar 31, 2024
  *      Author: Noha
  */
+
 #include"../MCAL/INCLUDES/Systick.h"
 #include "../MCAL/INCLUDES/RCC.h"
 #include "../HAL/INCLUDES/LED.h"
 
-void LedOn (void);
+void LEDToggle (void);
 void main(void)
 {
 	u16 AHBprescalerValue=2;
 	u8 APBprescalerValue=2;
-	RCC_ConfigurePrescaler(peripheral_GPIOB ,AHBprescalerValue,APBprescalerValue);
-	RCC_ControlPeripheral(peripheral_GPIOB,peri_status_enabled);
+	RCC_ConfigurePrescaler(peripheral_GPIOA ,AHBprescalerValue,APBprescalerValue);
+	RCC_ControlPeripheral(peripheral_GPIOA ,peri_status_enabled);
 	LED_init();
 	MSTK_init(STK_MODE_PERIODIC);
-	MSTK_setTime_ms(200);
-	MSTK_SetCallBack(LedOn);
+	MSTK_setTime_ms(2000);
+	MSTK_SetCallBack(LEDToggle);
 	MSTK_start();
 	APBprescalerValue=2;
 	while(1)
@@ -28,7 +29,9 @@ void main(void)
 
 }
 
-void LedOn (void)
+void LEDToggle (void)
 {
 	LED_toggleLed(led_3);
 }
+
+

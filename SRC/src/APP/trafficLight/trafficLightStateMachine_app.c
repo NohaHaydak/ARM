@@ -23,15 +23,20 @@ void trafficLight_runnable(void)
 {
 	static u8 state=GLed;
 	static u32 Loc_Sec=0;
+	static u8 pervious;
 	Loc_Sec+=PERIODICITY;
 	switch(state)
 	{
 	case GLed:
+		LED_setState(led_3, LED_ON );
+		LED_setState(led_2, LED_OFF );
+		LED_setState(led_1, LED_OFF );
 
-		if(Loc_Sec==6)
+		if(Loc_Sec==6000)
 		{
 			state=YLed;
 			Loc_Sec=0;
+			pervious=GLed;
 		}
 		else
 		{
@@ -39,10 +44,15 @@ void trafficLight_runnable(void)
 		}
 		break;
 	case RLed:
-		if(Loc_Sec==2)
+		LED_setState(led_3, LED_OFF );
+		LED_setState(led_2, LED_ON );
+		LED_setState(led_1, LED_OFF );
+
+		if(Loc_Sec==2000)
 		{
 			state=YLed;
 			Loc_Sec=0;
+			pervious=RLed;
 		}
 		else
 		{
@@ -51,12 +61,15 @@ void trafficLight_runnable(void)
 		break;
 
 	case YLed:
-		if(Loc_Sec==2)
+		LED_setState(led_3, LED_OFF );
+		LED_setState(led_2, LED_OFF );
+		LED_setState(led_1, LED_ON );
+		if(Loc_Sec==2000&&pervious==GLed)
 		{
 			state=RLed;
 			Loc_Sec=0;
 		}
-		else if(Loc_Sec==20)
+		else if(Loc_Sec==4000&&pervious==RLed)
 		{
 			state=GLed;
 			Loc_Sec=0;

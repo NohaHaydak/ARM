@@ -17,6 +17,7 @@ void main(void)
 	RCC_ControlPeripheral(peripheral_GPIOB,peri_status_enabled);
 	LED_init();
 	sched_init();
+    sched_start();
 }
 
 

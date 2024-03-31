@@ -104,12 +104,11 @@ u8 MSTK_IsExpired(u8* Add_STKisExpired)
 
     return error_status;
 }
-void MSTK_setTime_ms(u16 copy_STKtime)
+void MSTK_setTime_ms(u32 copy_STKtime)
 {
-    u32 Loc_numOfTicks;
-    Loc_numOfTicks=copy_STKtime/(1000/G_STK_freq);
-    STK->STK_LOAD&=STK_LOAD_CLR_MASK;
-    STK->STK_LOAD|=Loc_numOfTicks;
+    u64 Loc_numOfTicks;
+    Loc_numOfTicks=((copy_STKtime*G_STK_freq)/1000UL)-1;
+    STK->STK_LOAD=Loc_numOfTicks;
 }
 
 void MSTK_SetCallBack(STK_CB_t STK_CB)
