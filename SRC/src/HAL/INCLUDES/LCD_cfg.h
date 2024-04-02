@@ -8,6 +8,7 @@
 #ifndef HAL_INCLUDES_LCD_CFG_H_
 #define HAL_INCLUDES_LCD_CFG_H_
 
+
 #define LCD_MODE  EIGHT_BIT
 #define EIGHT_BIT 8
 #define FOUR_BIT 4
@@ -43,6 +44,9 @@
 #define VALID_ROW_RANGE 2
 #define VALID_COL_RANGE 16
 
+#define PINRS 0
+#define PINRW 1
+#define PINENABLE 2
 
 
 

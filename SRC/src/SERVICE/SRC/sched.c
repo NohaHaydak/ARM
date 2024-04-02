@@ -39,11 +39,14 @@ void sched_start(void)
     MSTK_start();
     while (1)
     {
-    	if(pendingTicks)
+    	/*if(pendingTicks)
     	{
-    		pendingTicks--;
+
+    	}*/pendingTicks--;
     		sched();
-    	}
+
+
+
 
     }
 

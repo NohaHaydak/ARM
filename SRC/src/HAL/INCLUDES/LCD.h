@@ -18,10 +18,10 @@
 #define LCD_RS_DATA 1
 #define LCD_RS 0
 #define LCD_RW 1
-#define LCD_ENABLE_OFF 0
-#define LCD_ENABLE_ON 1
 
 
+#define LCD_DISABLED 0
+#define LCD_ENABLED  1
 
 #define LCD_DB0 0
 #define LCD_DB1 1
@@ -110,14 +110,15 @@
 #define LCD_CGRAM_EIGHTH_LOCATION  7
 
 
+#define CONTROL_PINS 3
 
-u8 LCD_enuInit(void);
-u8 LCD_enuWriteData(u8 Copy_u8Data);
-u8 LCD_enuWriteCommand(u8 Copy_u8Command);
-u8 LCD_enuDisplaySpecialPattern(u8* Copy_pu8Pattern, u8 Copy_u8CGRAMBlockNumber, u8 Copy_u8X, u8 Copy_u8Y);
-u8 LCD_enuWriteString(char* Copy_pchPattern);
-u8 LCD_enuWriteNumber(s16 Copy_u8Number);
+#define LDC_DATA_PINS 8
 
 
+void LCD_Init(void);
+void LCD_task(void);
+void LCD_WriteString_Asynch(char* Copy_pchPattern );
+void LCD_enuGotoDDRAM_XY_Asynch(u8 Copy_u8Row, u8 Copy_u8Col);
+void LCD_ClrScreen_Asynch(void);
 
 #endif /* HAL_INCLUDES_LCD_H_ */

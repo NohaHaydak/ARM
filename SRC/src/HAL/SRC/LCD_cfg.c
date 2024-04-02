@@ -1,0 +1,29 @@
+/*
+ * LCD_cfg.c
+ *
+ *  Created on: Apr 1, 2024
+ *      Author: Noha
+ */
+#include "../../MCAL/INCLUDES/GPIO.h"
+#include "../INCLUDES/LCD.h"
+GPIO_pin_t G_GPIO_pin[CONTROL_PINS]=
+{
+		[PINRS]={.GPIONum=GPIOA,.pinNum=GPIO_PIN_NUM0, .pinMode=PIN_STATUS_GP_OUTPUT_PP},
+		[PINRW]={.GPIONum=GPIOA, .pinNum=GPIO_PIN_NUM1, .pinMode=PIN_STATUS_GP_OUTPUT_PP},
+		[PINENABLE]={.GPIONum=GPIOA, .pinNum=GPIO_PIN_NUM2, .pinMode=PIN_STATUS_GP_OUTPUT_PP}
+};
+
+GPIO_pin_t LCD_arrStructDataPins[LDC_DATA_PINS]=
+{
+		[LCD_DB0]={.GPIONum=GPIOB, .pinNum=GPIO_PIN_NUM0, .pinMode=PIN_STATUS_GP_OUTPUT_PP},
+		[LCD_DB1]={.GPIONum=GPIOB, .pinNum=GPIO_PIN_NUM1, .pinMode=PIN_STATUS_GP_OUTPUT_PP},
+		[LCD_DB2]={.GPIONum=GPIOB, .pinNum=GPIO_PIN_NUM2, .pinMode=PIN_STATUS_GP_OUTPUT_PP},
+		[LCD_DB3]={.GPIONum=GPIOB, .pinNum=GPIO_PIN_NUM3, .pinMode=PIN_STATUS_GP_OUTPUT_PP},
+		[LCD_DB4]={.GPIONum=GPIOB, .pinNum=GPIO_PIN_NUM4, .pinMode=PIN_STATUS_GP_OUTPUT_PP},
+		[LCD_DB5]={.GPIONum=GPIOB, .pinNum=GPIO_PIN_NUM5, .pinMode=PIN_STATUS_GP_OUTPUT_PP},
+		[LCD_DB6]={.GPIONum=GPIOB, .pinNum=GPIO_PIN_NUM6, .pinMode=PIN_STATUS_GP_OUTPUT_PP},
+		[LCD_DB7]={.GPIONum=GPIOB, .pinNum=GPIO_PIN_NUM7, .pinMode=PIN_STATUS_GP_OUTPUT_PP}
+};
+
+
+
