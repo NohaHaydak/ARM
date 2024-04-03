@@ -18,7 +18,7 @@ void main(void)
 	RCC_ControlPeripheral(peripheral_GPIOB,peri_status_enabled);
 	//LCD_enuGotoDDRAM_XY_Asynch(0,12);
 	//LCD_WriteString_Asynch("noha");
-	LCD_enuWriteNumber_Asynch(8);
+	LCD_enuWriteNumber_Asynch(-5);
 	sched_init();
 
 	sched_start();
