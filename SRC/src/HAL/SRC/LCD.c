@@ -599,6 +599,12 @@ void LCD_ClrScreenProcess(void)
 
 void LCD_enuWriteNumberProcess(void)
 {
+	s16 Loc_LTen=GuserReq[G_CurrBuffer].num;
+	u8 flag=0;
+	u8 Loc_NegNum=GuserReq[G_CurrBuffer].num*-1;
+	u8 Loc_NegNumLten=Loc_NegNum;
+	static u8 itr=0;
+	u8 counter = 0;
 	switch(GuserReq[G_CurrBuffer].state)
 	{
 		case USER_REQ_BUSY:
@@ -609,22 +615,20 @@ void LCD_enuWriteNumberProcess(void)
 					LCD_WriteData(GuserReq[G_CurrBuffer].num+'0');
 					G_enableBit=LCD_ENABLED;
 					LCD_EnablePin(G_enableBit);
+					flag=1;
 				}
 				else if (GuserReq[G_CurrBuffer].num >= 10)
 				{
-					static u8 counter = 0;
+
 					u8 arr[16];
-					static u8 itr=0;
 					u8 Local_c=0;
-					if(itr==0)
+
+					while (Loc_LTen)
 					{
-						while (GuserReq[G_CurrBuffer].num)
-						{
-							u8 local_RemainderNum = GuserReq[G_CurrBuffer].num % 10;
-							GuserReq[G_CurrBuffer].num = GuserReq[G_CurrBuffer].num / 10;
-							arr[counter] = local_RemainderNum;
-							counter++;
-						}
+						u8 local_RemainderNum = Loc_LTen % 10;
+						Loc_LTen /=10;
+						arr[counter] = local_RemainderNum;
+						counter++;
 					}
 
 
@@ -635,9 +639,8 @@ void LCD_enuWriteNumberProcess(void)
 					itr++;
 					if(itr==counter+1)
 					{
-						GuserReq[G_CurrBuffer].type=USER_REQ_TYPE_NULL;
-						itr=0;
-						counter=0;
+						flag=1;
+
 					}
 					else
 					{
@@ -650,41 +653,55 @@ void LCD_enuWriteNumberProcess(void)
 				}
 				else if(GuserReq[G_CurrBuffer].num<0)
 				{
-
-					if(GuserReq[G_CurrBuffer].num>-10)
+					if(itr==0)
 					{
 						LCD_WriteData('-');
-						G_enableBit=LCD_ENABLED;
-						LCD_EnablePin(G_enableBit);
-						GuserReq[G_CurrBuffer].num*= -1;
-						LCD_WriteData(GuserReq[G_CurrBuffer].num+'0');
 						G_enableBit=LCD_ENABLED;
 						LCD_EnablePin(G_enableBit);
 					}
-					if (GuserReq[G_CurrBuffer].num <= -10)
+					itr++;
+					if(GuserReq[G_CurrBuffer].num>-10)
 					{
-						LCD_WriteData('-');
+
+						LCD_WriteData(Loc_NegNum+'0');
 						G_enableBit=LCD_ENABLED;
 						LCD_EnablePin(G_enableBit);
-						GuserReq[G_CurrBuffer].num=(GuserReq[G_CurrBuffer].num* -1);
-						static u8 counter = 0;
+						flag=1;
+
+
+
+					}
+					if (GuserReq[G_CurrBuffer].num <= -10)
+					{
+						u8 counter = 0;
 						u8 arr[16];
+						u8 Local_c=0;
 
-						while (GuserReq[G_CurrBuffer].num)
+
+						while (Loc_NegNumLten)
 						{
-							u8 local_RemainderNum = GuserReq[G_CurrBuffer].num % 10;
-							GuserReq[G_CurrBuffer].num = GuserReq[G_CurrBuffer].num / 10;
+							u8 local_RemainderNum = Loc_NegNumLten % 10;
+							Loc_NegNumLten/=10;
 							arr[counter] = local_RemainderNum;
-							counter++;
+						counter++;
 						}
 
-						for (u8 itr = 0; itr < counter; itr++)
+						Local_c = counter - 2 - itr;
+						LCD_WriteData(arr[Local_c] + '0'); // Display the digit by adding '0' to convert it to ASCII
+						G_enableBit=LCD_ENABLED;
+						LCD_EnablePin(G_enableBit);
+						itr++;
+
+						if(itr==counter+1)
 						{
-							u8 Local_c = counter - 1 - itr;
-							LCD_WriteData(arr[Local_c] + '0'); // Display the digit by adding '0' to convert it to ASCII
-							G_enableBit=LCD_ENABLED;
-							LCD_EnablePin(G_enableBit);
+							flag=1;
+
 						}
+						else
+						{
+
+						}
+
 					}
 				}
 				else
@@ -696,9 +713,15 @@ void LCD_enuWriteNumberProcess(void)
 
 			else if(G_enableBit==LCD_ENABLED)
 			{
+
 				G_enableBit=LCD_DISABLED;
 				LCD_EnablePin(G_enableBit);
-				GuserReq[G_CurrBuffer].type=USER_REQ_TYPE_NULL;
+				if(flag==1)
+				{
+					GuserReq[G_CurrBuffer].type=USER_REQ_TYPE_NULL;
+					itr=0;
+					flag=0;
+				}
 
 			}
 			else
