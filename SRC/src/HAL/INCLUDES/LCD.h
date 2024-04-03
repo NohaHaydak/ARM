@@ -120,5 +120,6 @@ void LCD_task(void);
 void LCD_WriteString_Asynch(char* Copy_pchPattern );
 void LCD_enuGotoDDRAM_XY_Asynch(u8 Copy_u8Row, u8 Copy_u8Col);
 void LCD_ClrScreen_Asynch(void);
+void LCD_enuWriteNumber_Asynch(s16 Copy_u8Number);
 
 #endif /* HAL_INCLUDES_LCD_H_ */

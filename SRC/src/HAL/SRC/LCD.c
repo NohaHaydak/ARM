@@ -25,6 +25,7 @@ typedef enum
 {
 	USER_REQ_TYPE_NULL,
 	USER_REQ_TYPE_WRITE_STRING,
+	USER_REQ_TYPE_WRITE_NUM,
 	USER_REQ_TYPE_SET_CURSSOR,
 	USER_REQ_TYPE_CLR,
 }userReqtype_t;
@@ -48,6 +49,7 @@ typedef struct
 {
 	const char* string;
 	userReqState_t state;
+	s16 num;
 	u32 length;
 	userReqtype_t type;
 	BufferState_t bufferState;
@@ -77,21 +79,22 @@ typedef struct
 u8 G_LCD_col=0;
 u8 G_LCD_Row=0;
 u8 G_enableBit=LCD_DISABLED;
-userReq_t GuserReq[REQ_BUFFER];
+userReq_t GuserReq;
 LCD_write_t G_LCD_write;
 LCD_state_t G_LCD_state=INIT_STATE;
-static u8 G_reqCounter=0;
-static u8 G_CurrBuffer=0;
+/*static u8 G_reqCounter=0;
+static u8 G_CurrBuffer=0;*/
 
 
 
-static void LCD_WriteProcess(void);
-static void LCD_ClrScreenProcess(void);
-static void LCD_enuGotoDDRAM_XYProcess(void);
-static void LCD_WriteData(u8 Copy_u8Data);
-static void LCD_WriteCommand(u8 Copy_u8Command);
-static void LCD_EnablePin(u8 Copy_LCDenablePin);
-static void LCD_HandlingReqBuffer(void);
+void LCD_WriteProcess(void);
+void LCD_ClrScreenProcess(void);
+void LCD_enuGotoDDRAM_XYProcess(void);
+void LCD_WriteData(u8 Copy_u8Data);
+void LCD_WriteCommand(u8 Copy_u8Command);
+void LCD_EnablePin(u8 Copy_LCDenablePin);
+void LCD_enuWriteNumberProcess(void);
+//static void LCD_HandlingReqBuffer(void);
 //each 1ms as runnable law 2ms gwa init hghir if >=
 void LCD_task(void)
 {
@@ -101,36 +104,29 @@ void LCD_task(void)
 			LCD_Init();
 			break;
 		case OPERATION_STATE:
-			switch(GuserReq[G_CurrBuffer].state)
-			{
-				case USER_REQ_BUSY:
-					switch(GuserReq[G_CurrBuffer].type)
-					{
-						case USER_REQ_TYPE_NULL:
-							break;
-						case USER_REQ_TYPE_WRITE_STRING:
-							LCD_WriteProcess();
-							break;
-						case USER_REQ_TYPE_SET_CURSSOR:
-							LCD_enuGotoDDRAM_XYProcess();
-							break;
-						case USER_REQ_TYPE_CLR:
-							LCD_ClrScreenProcess();
 
-					}
-					break;
+		switch(GuserReq.type)
+		{
+			case USER_REQ_TYPE_NULL:
+				break;
+			case USER_REQ_TYPE_WRITE_STRING:
+				LCD_WriteProcess();
+				break;
+			case USER_REQ_TYPE_SET_CURSSOR:
+				LCD_enuGotoDDRAM_XYProcess();
+				break;
+			case USER_REQ_TYPE_CLR:
+				LCD_ClrScreenProcess();
+				break;
+			case USER_REQ_TYPE_WRITE_NUM:
+				LCD_enuWriteNumberProcess();
+				break;
+			default:
+				break;
+		}
 
-					case USER_REQ_DONE:
-						LCD_HandlingReqBuffer();
-						break;
-					case USER_REQ_READY:
-						break;
-
-
-
-			}
-
-
+			break;
+		default:
 			break;
 
 	}
@@ -146,7 +142,7 @@ void LCD_Init(void)
 	switch(Loc_state)
 	{
 		case FUNCTION_SET:
-			if(Loc_sec>=1)
+			if(Loc_sec>=35)
 			{
 			#if LCD_MODE == EIGHT_BIT
 
@@ -347,7 +343,7 @@ void LCD_Init(void)
 						G_enableBit=LCD_DISABLED;
 						LCD_EnablePin(G_enableBit);
 						G_LCD_state=OPERATION_STATE;
-						GuserReq[G_CurrBuffer].state=USER_REQ_READY;
+
 						Loc_sec=0;
 					}
 
@@ -365,12 +361,12 @@ void LCD_Init(void)
 
 void LCD_WriteString_Asynch(char* Copy_pchPattern )
 {
-	GuserReq[G_CurrBuffer].length=strlen(Copy_pchPattern);
-	if(G_LCD_state==OPERATION_STATE&&GuserReq[G_CurrBuffer].state==USER_REQ_READY)
+	GuserReq.length=strlen(Copy_pchPattern);
+	if(GuserReq.state==USER_REQ_READY)
 	{
-		GuserReq[G_CurrBuffer].state=USER_REQ_BUSY;
-		GuserReq[G_CurrBuffer].type=USER_REQ_TYPE_WRITE_STRING ;
-		GuserReq[G_CurrBuffer].string=Copy_pchPattern;
+		GuserReq.state=USER_REQ_BUSY;
+		GuserReq.string=Copy_pchPattern;
+		GuserReq.type=USER_REQ_TYPE_WRITE_STRING ;
 	}
 	else
 	{
@@ -380,10 +376,10 @@ void LCD_WriteString_Asynch(char* Copy_pchPattern )
 
 void LCD_enuGotoDDRAM_XY_Asynch(u8 Copy_u8Row, u8 Copy_u8Col)
 {
-	if(G_LCD_state==OPERATION_STATE&&GuserReq[G_CurrBuffer].state==USER_REQ_READY)
+	if(GuserReq.state==USER_REQ_READY)
 	{
-		GuserReq[G_CurrBuffer].state=USER_REQ_BUSY;
-		GuserReq[G_CurrBuffer].type=USER_REQ_TYPE_SET_CURSSOR ;
+		GuserReq.state=USER_REQ_BUSY;
+		GuserReq.type=USER_REQ_TYPE_SET_CURSSOR ;
 		G_LCD_write.CURSSOR_POS.COL_NUM=Copy_u8Col;
 		G_LCD_write.CURSSOR_POS.ROW_NUM=Copy_u8Row;
 	}
@@ -395,10 +391,10 @@ void LCD_enuGotoDDRAM_XY_Asynch(u8 Copy_u8Row, u8 Copy_u8Col)
 
 void LCD_ClrScreen_Asynch(void)
 {
-	if(G_LCD_state==OPERATION_STATE&&GuserReq[G_CurrBuffer].state==USER_REQ_READY)
+	if(GuserReq.state==USER_REQ_READY)
 	{
-		GuserReq[G_CurrBuffer].state=USER_REQ_BUSY;
-		GuserReq[G_CurrBuffer].type=USER_REQ_TYPE_CLR ;
+		GuserReq.state=USER_REQ_BUSY;
+		GuserReq.type=USER_REQ_TYPE_CLR ;
 	}
 	else
 	{
@@ -407,21 +403,24 @@ void LCD_ClrScreen_Asynch(void)
 
 }
 
-void LCD_WriteCB(LCDcb_t LCDcb)
+void LCD_enuWriteNumber_Asynch(s16 Copy_u8Number)
 {
-	if(LCDcb)
+	if(GuserReq.state==USER_REQ_READY)
 	{
-		G_LCD_write.LCD_CB=LCDcb;
+		GuserReq.state=USER_REQ_BUSY;
+		GuserReq.num=Copy_u8Number;
+		GuserReq.type=USER_REQ_TYPE_WRITE_NUM ;
 	}
+
 }
 
 void LCD_enuGotoDDRAM_XYProcess(void)
 {
 	static u8 local_DdramAdress=0;
 	static u8 local_DdramCommand=0;
-	switch(GuserReq[G_CurrBuffer].state)
+	switch(GuserReq.state)
 	{
-		case USER_REQ_READY:
+		case USER_REQ_BUSY:
 			if(G_enableBit==LCD_DISABLED)
 			{
 
@@ -448,16 +447,17 @@ void LCD_enuGotoDDRAM_XYProcess(void)
 				/*...............generate pulses to switch on the enable pin.............*/
 				G_enableBit=LCD_DISABLED;
 				LCD_EnablePin(G_enableBit);
-				GuserReq[G_CurrBuffer].state=USER_REQ_DONE;
+				GuserReq.state=USER_REQ_DONE;
 			}
 
 			break;
 
 		case USER_REQ_DONE:
-			GuserReq[G_CurrBuffer].state=USER_REQ_READY;
-			GuserReq[G_CurrBuffer].type=USER_REQ_TYPE_NULL;
+			GuserReq.state=USER_REQ_READY;
+			GuserReq.type=USER_REQ_TYPE_NULL;
 			break;
-		case USER_REQ_BUSY:
+		case USER_REQ_READY:
+			GuserReq.state=USER_REQ_BUSY;
 			break;
 		default:
 			break;
@@ -467,21 +467,21 @@ void LCD_enuGotoDDRAM_XYProcess(void)
 }
 void LCD_WriteProcess(void)
 {
-	switch(GuserReq[G_CurrBuffer].state)
+	switch(GuserReq.state)
 	{
-		case USER_REQ_READY:
+		case USER_REQ_BUSY:
 			if(G_enableBit==LCD_DISABLED)
 			{
 
-				if(G_LCD_write.CURRENT_POSITION==GuserReq[G_CurrBuffer].length)
+				if(G_LCD_write.CURRENT_POSITION==GuserReq.length)
 				{
-					GuserReq[G_CurrBuffer].state=USER_REQ_DONE;
+					GuserReq.state=USER_REQ_DONE;
 					G_LCD_write.CURRENT_POSITION=0;
 
 				}
 				else
 				{
-					 LCD_WriteData(GuserReq[G_CurrBuffer].string[G_LCD_write.CURRENT_POSITION]);
+					 LCD_WriteData(GuserReq.string[G_LCD_write.CURRENT_POSITION]);
 					 G_LCD_write.CURRENT_POSITION++;
 					 /*if(G_LCD_write.CURSSOR_POS.COL_NUM<VALID_COL_RANGE)
 					 {
@@ -506,11 +506,12 @@ void LCD_WriteProcess(void)
 			break;
 
 		case USER_REQ_DONE:
-			GuserReq[G_CurrBuffer].state=USER_REQ_READY;
-			GuserReq[G_CurrBuffer].type=USER_REQ_TYPE_NULL;
+			GuserReq.state=USER_REQ_READY;
+			GuserReq.type=USER_REQ_TYPE_NULL;
 			//irq++
 			break;
-		case USER_REQ_BUSY:
+		case USER_REQ_READY:
+			GuserReq.state=USER_REQ_BUSY;
 			break;
 		default:
 			break;
@@ -524,9 +525,9 @@ void LCD_WriteProcess(void)
 void LCD_ClrScreenProcess(void)
 {
 	static u32 Loc_sec;
-	switch(GuserReq[G_CurrBuffer].state)
+	switch(GuserReq.state)
 		{
-			case USER_REQ_READY:
+			case USER_REQ_BUSY:
 				if(G_enableBit==LCD_DISABLED)
 				{
 					LCD_WriteCommand(DISPLAY_CLEAR);
@@ -547,7 +548,7 @@ void LCD_ClrScreenProcess(void)
 				{
 					G_enableBit=LCD_DISABLED;
 					LCD_EnablePin(G_enableBit);
-					GuserReq[G_CurrBuffer].state=USER_REQ_DONE;
+					GuserReq.state=USER_REQ_DONE;
 
 				}
 				else
@@ -557,16 +558,122 @@ void LCD_ClrScreenProcess(void)
 				break;
 
 			case USER_REQ_DONE:
-				GuserReq[G_CurrBuffer].state=USER_REQ_READY;
-				GuserReq[G_CurrBuffer].type=USER_REQ_TYPE_NULL;
+				GuserReq.state=USER_REQ_READY;
+				GuserReq.type=USER_REQ_TYPE_NULL;
 				//irq++
 				break;
-			case USER_REQ_BUSY:
+			case USER_REQ_READY:
 				break;
 			default:
 				break;
 
 		}
+
+}
+
+
+void LCD_enuWriteNumberProcess(void)
+{
+	switch(GuserReq.state)
+	{
+		case USER_REQ_BUSY:
+			if(G_enableBit==LCD_DISABLED)
+			{
+				if(GuserReq.num>=0 && GuserReq.num<10)
+				{
+					LCD_WriteData(GuserReq.num+'0');
+					G_enableBit=LCD_ENABLED;
+					LCD_EnablePin(G_enableBit);
+				}
+				else if (GuserReq.num >= 10)
+				{
+					static u8 counter = 0;
+					u8 arr[16];
+
+					while (GuserReq.num)
+					{
+						u8 local_RemainderNum = GuserReq.num % 10;
+						GuserReq.num = GuserReq.num / 10;
+						arr[counter] = local_RemainderNum;
+						counter++;
+					}
+
+					for (u8 itr = 0; itr < counter; itr++)
+					{
+						u8 Local_c = counter - 1 - itr;
+						LCD_WriteData(arr[Local_c] + '0'); // Display the digit by adding '0' to convert it to ASCII
+						G_enableBit=LCD_ENABLED;
+						LCD_EnablePin(G_enableBit);
+					}
+				}
+				else if(GuserReq.num<0)
+				{
+
+					if(GuserReq.num>-10)
+					{
+						LCD_WriteData('-');
+						GuserReq.num=(GuserReq.num* -1);
+						LCD_WriteData(GuserReq.num+'0');
+						G_enableBit=LCD_ENABLED;
+						LCD_EnablePin(G_enableBit);
+					}
+					if (GuserReq.num <= -10)
+					{
+						LCD_WriteData('-');
+						GuserReq.num=(GuserReq.num* -1);
+						static u8 counter = 0;
+						u8 arr[16];
+
+						while (GuserReq.num)
+						{
+							u8 local_RemainderNum = GuserReq.num % 10;
+							GuserReq.num = GuserReq.num / 10;
+							arr[counter] = local_RemainderNum;
+							counter++;
+						}
+
+						for (u8 itr = 0; itr < counter; itr++)
+						{
+							u8 Local_c = counter - 1 - itr;
+							LCD_WriteData(arr[Local_c] + '0'); // Display the digit by adding '0' to convert it to ASCII
+							G_enableBit=LCD_ENABLED;
+							LCD_EnablePin(G_enableBit);
+						}
+					}
+				}
+				else
+				{
+
+				}
+
+			}
+
+			else if(G_enableBit==LCD_ENABLED)
+			{
+				G_enableBit=LCD_DISABLED;
+				LCD_EnablePin(G_enableBit);
+				GuserReq.state=USER_REQ_DONE;
+
+			}
+			else
+			{
+
+			}
+			break;
+
+			case USER_REQ_DONE:
+			GuserReq.state=USER_REQ_READY;
+			GuserReq.type=USER_REQ_TYPE_NULL;
+			//irq++
+			break;
+			case USER_REQ_READY:
+			break;
+			default:
+			break;
+
+	}
+
+
 
 }
 void LCD_WriteData(u8 Copy_u8Data)
@@ -668,7 +775,11 @@ void LCD_WriteCommand(u8 Copy_u8Command)
 
 }
 
-void LCD_HandlingReqBuffer(void)
+
+
+
+
+/*void LCD_HandlingReqBuffer(void)
 {
 	GuserReq[G_CurrBuffer].bufferState=BUFFER_EMPTY;
 	for(G_reqCounter=0;G_reqCounter<REQ_BUFFER;G_reqCounter++)
@@ -694,7 +805,7 @@ void LCD_HandlingReqBuffer(void)
 			G_CurrBuffer=0; // Reset current buffer index
 		}
 	}
-}
+}*/
 void LCD_EnablePin(u8 Copy_LCDenablePin)
 {
 	GPIO_setPinValue(G_GPIO_pin[PINENABLE].GPIONum,G_GPIO_pin[PINENABLE].pinNum,Copy_LCDenablePin);
