@@ -605,23 +605,16 @@ void LCD_enuWriteNumberProcess(void)
 	u8 Loc_NegNumLten=Loc_NegNum;
 	static u8 itr=0;
 	u8 counter = 0;
+	u8 arr[16];
+	u8 Local_c=0;
 	switch(GuserReq[G_CurrBuffer].state)
 	{
 		case USER_REQ_BUSY:
 			if(G_enableBit==LCD_DISABLED)
 			{
-				if(GuserReq[G_CurrBuffer].num>=0 && GuserReq[G_CurrBuffer].num<10)
-				{
-					LCD_WriteData(GuserReq[G_CurrBuffer].num+'0');
-					G_enableBit=LCD_ENABLED;
-					LCD_EnablePin(G_enableBit);
-					flag=1;
-				}
-				else if (GuserReq[G_CurrBuffer].num >= 10)
+				if(GuserReq[G_CurrBuffer].num>=0)
 				{
 
-					u8 arr[16];
-					u8 Local_c=0;
 
 					while (Loc_LTen)
 					{
@@ -648,61 +641,41 @@ void LCD_enuWriteNumberProcess(void)
 					}
 
 
-
-
 				}
 				else if(GuserReq[G_CurrBuffer].num<0)
 				{
-					if(itr==0)
+					while (Loc_NegNum)
 					{
-						LCD_WriteData('-');
-						G_enableBit=LCD_ENABLED;
-						LCD_EnablePin(G_enableBit);
-					}
-					itr++;
-					if(GuserReq[G_CurrBuffer].num>-10)
-					{
+						u8 local_RemainderNum = Loc_NegNum % 10;
+						Loc_NegNum /=10;
 
-						LCD_WriteData(Loc_NegNum+'0');
-						G_enableBit=LCD_ENABLED;
-						LCD_EnablePin(G_enableBit);
-						flag=1;
-
-
-
-					}
-					if (GuserReq[G_CurrBuffer].num <= -10)
-					{
-						u8 counter = 0;
-						u8 arr[16];
-						u8 Local_c=0;
-
-
-						while (Loc_NegNumLten)
-						{
-							u8 local_RemainderNum = Loc_NegNumLten % 10;
-							Loc_NegNumLten/=10;
-							arr[counter] = local_RemainderNum;
+						arr[counter]= local_RemainderNum;
 						counter++;
-						}
-
-						Local_c = counter - 2 - itr;
+					}
+					arr[counter]='-';
+					Local_c = counter - itr;
+					if(Local_c==counter)
+					{
+						LCD_WriteData(arr[counter]);
+					}
+					else
+					{
 						LCD_WriteData(arr[Local_c] + '0'); // Display the digit by adding '0' to convert it to ASCII
-						G_enableBit=LCD_ENABLED;
-						LCD_EnablePin(G_enableBit);
-						itr++;
+					}
 
-						if(itr==counter+1)
-						{
-							flag=1;
-
-						}
-						else
-						{
-
-						}
+					G_enableBit=LCD_ENABLED;
+					LCD_EnablePin(G_enableBit);
+					itr++;
+					if(itr==counter+2)
+					{
+					flag=1;
 
 					}
+					else
+					{
+
+					}
+
 				}
 				else
 				{

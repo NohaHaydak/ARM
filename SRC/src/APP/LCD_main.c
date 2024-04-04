@@ -16,9 +16,11 @@ void main(void)
 	RCC_ControlPeripheral(peripheral_GPIOA,peri_status_enabled);
 	RCC_ConfigurePrescaler(peripheral_GPIOB ,AHBprescalerValue,APBprescalerValue);
 	RCC_ControlPeripheral(peripheral_GPIOB,peri_status_enabled);
-	//LCD_enuGotoDDRAM_XY_Asynch(0,12);
-	//LCD_WriteString_Asynch("noha");
-	LCD_enuWriteNumber_Asynch(-5);
+	LCD_enuGotoDDRAM_XY_Asynch(1,9);
+	LCD_WriteString_Asynch("noha");
+	LCD_enuWriteNumber_Asynch(-15);
+	//LCD_enuGotoDDRAM_XY_Asynch(1,10);
+	//LCD_enuWriteNumber_Asynch(5);
 	sched_init();
 
 	sched_start();
