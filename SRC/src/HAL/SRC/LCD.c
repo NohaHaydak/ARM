@@ -36,7 +36,7 @@ typedef enum
 {
 	USER_REQ_READY,
 	USER_REQ_BUSY,
-	USER_REQ_DONE //when all HW reqs/ bits are sent (we send string as char by char)
+	USER_REQ_DONE //when all HW reqs/bits are sent (we send string as char by char)
 }userReqState_t;
 
 
@@ -816,11 +816,6 @@ void LCD_WriteCommand(u8 Copy_u8Command)
 	#endif
 
 }
-
-
-
-
-
 void LCD_HandlingReqBufferProcess(void)
 {
 	GuserReq[G_CurrBuffer].state=USER_REQ_READY;
@@ -833,24 +828,7 @@ void LCD_HandlingReqBufferProcess(void)
 
 	}
 }
-	/*for(G_reqCounter=0;G_reqCounter<REQ_BUFFER;G_reqCounter++)
-	{
-		if(GuserReq[G_reqCounter].bufferState==BUFFERED)
-		{
-			break;
-		}
-	}
 
-	else
-	{
-		G_CurrBuffer=G_reqCounter; // Update current buffer index
-		GuserReq[G_CurrBuffer].state=USER_REQ_READY; // Set request state to request start
-		if (G_CurrBuffer==REQ_BUFFER) // Check if current buffer index equals LCD buffer size
-		{
-			G_CurrBuffer=0; // Reset current buffer index
-		}
-	}
-}*/
 void LCD_EnablePin(u8 Copy_LCDenablePin)
 {
 	GPIO_setPinValue(G_GPIO_pin[PINENABLE].GPIONum,G_GPIO_pin[PINENABLE].pinNum,Copy_LCDenablePin);
