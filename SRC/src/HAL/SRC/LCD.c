@@ -450,14 +450,13 @@ void LCD_enuGotoDDRAM_XYProcess(void)
 			if(G_enableBit==LCD_DISABLED)
 			{
 
-				if(G_LCD_write.CURSSOR_POS.ROW_NUM==0&&G_LCD_write.CURSSOR_POS.COL_NUM<VALID_COL_RANGE)
+				if(G_LCD_write.CURSSOR_POS.ROW_NUM==0)
 				{
 					/*.......................if we chose first row , the base address we start counting from is 0x00 and local_DdramAdress is according to col num..............*/
 					local_DdramAdress=G_LCD_write.CURSSOR_POS.COL_NUM;
 				}
-				else if(G_LCD_write.CURSSOR_POS.COL_NUM>=VALID_COL_RANGE)
+				else
 				{
-					G_LCD_write.CURSSOR_POS.ROW_NUM=1;
 					/*.....if we chose second row , the base address we start counting from is 0x40 and local_DdramAdress is according to the sum of both col and row num........*/
 					local_DdramAdress=SEC_ROW_START+G_LCD_write.CURSSOR_POS.COL_NUM;
 				}
