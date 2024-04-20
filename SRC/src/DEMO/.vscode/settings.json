@@ -1,0 +1,9 @@
+{
+    "stm32-for-vscode.openOCDPath": false,
+    "files.associations": {
+        "std_types.h": "c",
+        "keypad.h": "c",
+        "edit.h": "c",
+        "mode.h": "c"
+    }
+}
