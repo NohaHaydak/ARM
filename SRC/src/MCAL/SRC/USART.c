@@ -289,11 +289,11 @@ u8 UASRT_TXBufferAsynchZC(void* Copy_USARTNum, u8*Copy_Buffer, u16 Copy_length,T
     {
         TXReq.Buffer.Data=Copy_Buffer;
         TXReq.Buffer.Size=Copy_length;
+        G_TXReqState=TXREQ_STATAE_BUSY;
         TXReq.CB=Copy_Cb;
         /*Send first Byte to start intterupt and step into handler*/
         ((volatile USART_t * const)Copy_USARTNum)->USART_DR=Copy_Buffer[B0];
-        TXReq.Buffer.Position++;
-        G_TXReqState=TXREQ_STATAE_BUSY;
+        TXReq.Buffer.Position++;       
     }
     
 }
@@ -315,8 +315,8 @@ u8 UASRT_RXBufferAsynchZC(void* Copy_USARTNum, u8*Copy_Buffer, u16 Copy_length,R
     {
         RXReq.Buffer.Data=Copy_Buffer;
         RXReq.Buffer.Size=Copy_length;
-        RXReq.CB=Copy_Cb;
         G_RXReqState=RXREQ_STATAE_BUSY;
+        RXReq.CB=Copy_Cb;
     }
     
 }
@@ -335,7 +335,7 @@ void USART1_IRQHandler(void)
         }
         
 
-        if( TXReq.Buffer.Position== TXReq.Buffer.Size)
+        else if( TXReq.Buffer.Position== TXReq.Buffer.Size)
         {
             G_TXReqState=TXREQ_STATAE_READY;
             if(TXReq.CB)
@@ -355,7 +355,7 @@ void USART1_IRQHandler(void)
         }
         
 
-        if( RXReq.Buffer.Position== RXReq.Buffer.Size)
+        else if( RXReq.Buffer.Position== RXReq.Buffer.Size)
         {
             G_RXReqState=RXREQ_STATAE_READY;
             if(RXReq.CB)
